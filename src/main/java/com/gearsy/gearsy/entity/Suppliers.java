@@ -1,0 +1,25 @@
+package com.gearsy.gearsy.entity;
+import jakarta.persistence.*;
+import lombok.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
+@Entity
+@Table(name = "Suppliers")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Suppliers {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long supplierId;
+
+    private String name;
+    private String contactEmail;
+    private String contactPhone;
+    private String address;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+
