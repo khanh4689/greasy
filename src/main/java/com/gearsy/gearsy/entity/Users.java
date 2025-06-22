@@ -31,11 +31,17 @@ public class Users {
     private String avatar;
     private String address;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role = "User";
+    private UserRole role = UserRole.User;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status = "Active";
+    private UserStatus status = UserStatus.Active;
 
     private LocalDateTime createdAt;
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
