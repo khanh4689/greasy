@@ -22,4 +22,5 @@ public class Categories {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String images;
 }

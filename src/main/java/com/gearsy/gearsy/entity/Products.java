@@ -20,11 +20,13 @@ public class Products {
     private String description;
     private String images;
     private String compatibilitySpecs;
-    private Boolean isHidden;
+    private Boolean hidden;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private Categories category;
+    @OneToMany(mappedBy = "product")
+    private List<ProductPromotions> productPromotions;
+
 }

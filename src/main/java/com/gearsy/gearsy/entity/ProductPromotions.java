@@ -9,16 +9,16 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product_Promotions {
+public class ProductPromotions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productPromotionId;
 
     @ManyToOne
-    @JoinColumn(name = "productId")
+    @JoinColumn(name = "productid")
     private Products product;
 
     @ManyToOne
-    @JoinColumn(name = "promotionId")
+    @JoinColumn(name = "promotionid")
     private Promotions promotion;
 }
