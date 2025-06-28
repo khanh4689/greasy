@@ -34,7 +34,10 @@ public class SecurityConfig {
                                 "/auth/verify",
                                 "/auth/forgot-password",
                                 "/auth/reset-password",
-                                "/auth/login"
+                                "/auth/login",
+                                "/products/**",            // ✅ Thêm dòng này
+                                "/images/**",              // ✅ Nếu bạn có dùng ảnh trong static/images
+                                "/", "/home", "/index"     // ✅ Tùy chọn thêm nếu bạn có trang chủ
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
@@ -46,6 +49,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -64,4 +68,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
+
 }
