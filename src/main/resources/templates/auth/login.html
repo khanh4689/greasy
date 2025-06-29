@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body class="container mt-5">
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4 text-center">Login</h2>
+
+        <form th:action="@{/auth/login}" th:object="${authRequest}" method="post" onsubmit="return validateLogin()" class="border p-4 rounded shadow">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" th:field="*{email}" class="form-control" id="email" required>
+                <div id="emailError" class="text-danger mt-1"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" th:field="*{password}" class="form-control" id="password" required>
+                    <span class="input-group-text">
+                        <i class="fas fa-eye" id="togglePassword" style="cursor:pointer;"></i>
+                    </span>
+                </div>
+                <div id="passwordError" class="text-danger mt-1"></div>
+            </div>
+
+            <p th:if="${error}" class="text-danger text-center" th:text="${error}"></p>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Login</button>
+                <a th:href="@{/auth/forgot-password}" class="btn btn-link">Forgot Password?</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JS Toggle Password -->
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function () {
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    function validateLogin() {
+        // Optional: implement validation logic if needed
+        return true;
+    }
+</script>
+</body>
+</html>
