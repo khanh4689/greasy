@@ -35,7 +35,7 @@ public class AuthService {
         newUser.setEmail(request.getEmail());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setName(request.getName());
-        newUser.setRole(UserRole.User);
+        newUser.setRole(UserRole.USER);
         newUser.setStatus(UserStatus.Inactive); // chờ xác thực email
         newUser.setCreatedAt(LocalDateTime.now());
 
@@ -113,4 +113,9 @@ public class AuthService {
         return "Password reset successfully.";
     }
 
+
+    public Users getUserByEmail(String email) {
+        return usersRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
