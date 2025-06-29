@@ -32,12 +32,14 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/register",
                                 "/auth/verify",
+                                "/layout/",
+                                "/fragments/",
                                 "/auth/forgot-password",
                                 "/auth/reset-password",
                                 "/auth/login",
-                                "/products/**",            // ✅ Thêm dòng này
-                                "/images/**",              // ✅ Nếu bạn có dùng ảnh trong static/images
-                                "/", "/home", "/index"     // ✅ Tùy chọn thêm nếu bạn có trang chủ
+                                "/products/**",
+                                "/images/**",
+                                "/", "/home", "/index"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")

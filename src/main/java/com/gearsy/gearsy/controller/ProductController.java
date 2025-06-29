@@ -48,8 +48,8 @@
 
             model.addAttribute("categories", categoryService.getAllCategories());
             model.addAttribute("discountedCategories", categoryService.getDiscountedCategoriesToday());
-
-            return "product/views";
+            model.addAttribute("contentTemplate", "product/views");
+            return "layout";
         }
 
 
