@@ -1,0 +1,186 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+  <div class="container my-4">
+    <!-- 🧾 Tiêu đề -->
+    <h2 class="mb-4">
+      <i class="bi bi-cart-check me-2 text-primary"></i>Giỏ hàng của bạn
+    </h2>
+
+    <!-- 🔹 Giỏ hàng trống -->
+    <div th:if="${#lists.isEmpty(items)}" class="alert alert-info d-flex align-items-center">
+      <i class="bi bi-info-circle-fill me-2"></i>Giỏ hàng của bạn đang trống.
+    </div>
+
+    <!-- ✅ Danh sách sản phẩm -->
+    <div th:if="${!#lists.isEmpty(items)}">
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center">
+          <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+            <th>Xoá</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="item, iter : ${items}">
+            <td th:text="${iter.count}">1</td>
+            <td th:text="${item.product.name}">Tên SP</td>
+            <td>
+              <form th:action="@{/user/cart/update}" method="post" class="d-flex justify-content-center">
+                <input type="hidden" name="cartItemId" th:value="${item.cartItemId}" />
+                <input type="number" name="quantity" min="1" class="form-control w-50"
+                       th:value="${item.quantity}" required />
+                <button type="submit" class="btn btn-sm btn-outline-success ms-2">
+                  <i class="bi bi-arrow-clockwise"></i>
+                </button>
+              </form>
+            </td>
+            <td th:text="${#numbers.formatDecimal(item.product.price, 0, 'POINT', 3, 'COMMA') + ' đ'}">0</td>
+            <td th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'POINT', 3, 'COMMA') + ' đ'}">0</td>
+            <td>
+              <form th:action="@{/user/cart/remove}" method="post">
+                <input type="hidden" name="cartItemId" th:value="${item.cartItemId}" />
+                <button type="submit" class="btn btn-sm btn-danger" title="Xoá sản phẩm">
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 💰 Tổng tiền -->
+      <div class="text-end mt-4">
+        <h5 class="text-primary mb-3">
+          <i class="bi bi-cash-coin me-1"></i>Tổng tiền:
+          <span class="fw-bold" th:text="${#numbers.formatDecimal(total, 0, 'POINT', 3, 'COMMA') + ' đ'}">0 đ</span>
+        </h5>
+      </div>
+
+      <!-- 💰 Form thanh toán -->
+      <form th:action="@{/user/checkout}" method="post" id="checkoutForm"
+            class="mt-4 border p-3 rounded shadow-sm bg-light">
+        <div class="mb-3">
+          <label for="addressDetail" class="form-label">Địa chỉ giao hàng:</label>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="province">Tỉnh/Thành phố</label>
+              <select id="province" class="form-select" required></select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="district">Quận/Huyện</label>
+              <select id="district" class="form-select" required></select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="ward">Phường/Xã</label>
+              <select id="ward" name="ward" class="form-select" required></select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="addressDetail">Địa chỉ cụ thể (số nhà, đường...)</label>
+            <input type="text" id="addressDetail" class="form-control" placeholder="123 Lê Lợi..." required />
+          </div>
+          <!-- Ẩn input gộp địa chỉ -->
+          <input type="hidden" id="shippingAddress" name="shippingAddress" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Phương thức thanh toán:</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="paymentMethod" value="COD" id="cod" checked>
+            <label class="form-check-label" for="cod">Thanh toán khi nhận hàng (COD)</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="paymentMethod" value="VNPAY" id="vnpay">
+            <label class="form-check-label" for="vnpay">Thanh toán VNPay</label>
+          </div>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-success btn-lg">
+            <i class="bi bi-credit-card-2-front me-1"></i>Tiến hành thanh toán
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- ✅ JavaScript load địa chỉ và gộp trước khi submit -->
+  <script>
+  const provinceSelect = document.getElementById("province");
+  const districtSelect = document.getElementById("district");
+  const wardSelect = document.getElementById("ward");
+  const addressDetailInput = document.getElementById("addressDetail");
+  const shippingAddressInput = document.getElementById("shippingAddress");
+
+  // Load tỉnh
+  fetch("https://provinces.open-api.vn/api/?depth=1")
+    .then(res => res.json())
+    .then(data => {
+      provinceSelect.innerHTML = "<option value=''>-- Chọn Tỉnh/Thành phố --</option>";
+      data.forEach(province => {
+        const opt = document.createElement("option");
+        opt.value = province.code;
+        opt.textContent = province.name;
+        provinceSelect.appendChild(opt);
+      });
+    });
+
+  // Load quận/huyện khi chọn tỉnh
+  provinceSelect.addEventListener("change", () => {
+    const provinceCode = provinceSelect.value;
+    districtSelect.innerHTML = "<option value=''>-- Chọn Quận/Huyện --</option>";
+    wardSelect.innerHTML = "<option value=''>-- Chọn Phường/Xã --</option>";
+
+    fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+      .then(res => res.json())
+      .then(data => {
+        data.districts.forEach(district => {
+          const opt = document.createElement("option");
+          opt.value = district.code;
+          opt.textContent = district.name;
+          districtSelect.appendChild(opt);
+        });
+      });
+  });
+
+  // Load xã khi chọn huyện
+  districtSelect.addEventListener("change", () => {
+    const districtCode = districtSelect.value;
+    wardSelect.innerHTML = "<option value=''>-- Chọn Phường/Xã --</option>";
+
+    fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+      .then(res => res.json())
+      .then(data => {
+        data.wards.forEach(ward => {
+          const opt = document.createElement("option");
+          opt.value = ward.name;
+          opt.textContent = ward.name;
+          wardSelect.appendChild(opt);
+        });
+      });
+  });
+
+  // Gộp địa chỉ gửi lên server
+  document.getElementById("checkoutForm").addEventListener("submit", function (e) {
+    if (!provinceSelect.value || !districtSelect.value || !wardSelect.value || !addressDetailInput.value.trim()) {
+      alert("Vui lòng nhập đầy đủ thông tin địa chỉ giao hàng.");
+      e.preventDefault();
+      return;
+    }
+
+    const provinceText = provinceSelect.options[provinceSelect.selectedIndex].text;
+    const districtText = districtSelect.options[districtSelect.selectedIndex].text;
+    const wardText = wardSelect.options[wardSelect.selectedIndex].text;
+    const detail = addressDetailInput.value;
+
+    const fullAddress = `${detail}, ${wardText}, ${districtText}, ${provinceText}`;
+    shippingAddressInput.value = fullAddress;
+  });
+</script>
+</div>
+
+

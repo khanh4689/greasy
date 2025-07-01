@@ -2,6 +2,8 @@ package com.gearsy.gearsy.repository;
 
 import com.gearsy.gearsy.dto.DiscountedCategoryDTO;
 import com.gearsy.gearsy.entity.Categories;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,6 +23,9 @@ public interface CategoriesRepository extends JpaRepository<Categories, Long> {
                 GROUP BY c.categoryId, c.name, c.images
             """)
     List<DiscountedCategoryDTO> findCategoriesWithDiscountToday();
+
+    // Phân trang + tìm kiếm theo tên danh mục
+    Page<Categories> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }
 
 

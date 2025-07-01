@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Kết quả tìm kiếm</title>
-  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-</head>
-<body>
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
 <div class="container mt-5 mb-5">
+
   <!-- 🏷️ Tiêu đề -->
   <div class="row mb-4">
     <div class="col-12">
-      <h2 class="text-primary">Kết quả tìm kiếm cho: "<span th:text="${keyword}"></span>"</h2>
+      <h3 class="text-primary">
+        <i class="bi bi-search me-2"></i>Kết quả tìm kiếm cho:
+        <span class="fw-semibold text-dark">"<span th:text="${keyword}">Từ khóa</span>"</span>
+      </h3>
     </div>
   </div>
 
   <!-- ❗ Không có kết quả -->
   <div class="row" th:if="${#lists.isEmpty(products)}">
     <div class="col-12">
-      <div class="alert alert-warning">Không tìm thấy sản phẩm nào phù hợp.</div>
+      <div class="alert alert-warning d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Không tìm thấy sản phẩm nào phù hợp với từ khóa bạn đã nhập.
+      </div>
     </div>
   </div>
 
@@ -31,12 +31,15 @@
         <div class="card-body">
           <h5 class="card-title" th:text="${product.name}">Tên sản phẩm</h5>
 
+          <!-- Giá sale -->
           <div th:if="${product.onSale}">
             <p class="text-muted text-decoration-line-through mb-1"
                th:text="${#numbers.formatDecimal(product.originalPrice, 0, 'POINT', 3, 'COMMA') + ' đ'}"></p>
             <p class="text-danger fw-bold"
                th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'POINT', 3, 'COMMA') + ' đ'}"></p>
           </div>
+
+          <!-- Giá gốc -->
           <div th:if="${!product.onSale}">
             <p class="fw-semibold"
                th:text="${#numbers.formatDecimal(product.originalPrice, 0, 'POINT', 3, 'COMMA') + ' đ'}"></p>
@@ -49,7 +52,7 @@
   <!-- 🔢 Pagination -->
   <div class="row mt-4" th:if="${totalPages > 1}">
     <div class="col-12">
-      <nav>
+      <nav aria-label="Search pagination">
         <ul class="pagination justify-content-center">
           <li class="page-item" th:each="page : ${#numbers.sequence(0, totalPages - 1)}"
               th:classappend="${page == currentPage} ? 'active'">
@@ -61,9 +64,6 @@
       </nav>
     </div>
   </div>
-</div>
 
-<!-- Optional: Bootstrap JS -->
-<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-</body>
-</html>
+</div>
+</div>

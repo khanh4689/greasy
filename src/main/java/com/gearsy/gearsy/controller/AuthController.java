@@ -1,9 +1,12 @@
 package com.gearsy.gearsy.controller;
 
 import com.gearsy.gearsy.dto.AuthRequest;
+import com.gearsy.gearsy.dto.AuthResponse;
 import com.gearsy.gearsy.dto.RegisterRequest;
 import com.gearsy.gearsy.dto.ResetPasswordRequest;
 import com.gearsy.gearsy.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,15 +26,24 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String loginSubmit(@ModelAttribute AuthRequest authRequest, Model model) {
+    public String loginSubmit(@ModelAttribute AuthRequest authRequest, HttpServletResponse response, Model model) {
         try {
-            authService.login(authRequest);
-            return "redirect:/products/list"; // Trang chủ sau khi đăng nhập
+            AuthResponse authResponse = authService.login(authRequest);
+
+            Cookie jwtCookie = new Cookie("Authorization", authResponse.getToken());
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(7 * 24 * 60 * 60);
+            response.addCookie(jwtCookie);
+
+            return "redirect:/products/list";
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("error", "Lỗi hệ thống: " + e.getMessage());
             return "auth/login";
         }
     }
+
+
 
     @GetMapping("/register")
     public String registerPage(Model model) {

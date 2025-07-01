@@ -5,6 +5,8 @@ import com.gearsy.gearsy.repository.CategoriesRepository;
 import com.gearsy.gearsy.service.CategoriesService;
 import jdk.jfr.Category;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,5 +27,17 @@ public class CategoriesServiceImpl implements CategoriesService {
     @Override
     public List<DiscountedCategoryDTO> getDiscountedCategoriesToday() {
         return categoryRepository.findCategoriesWithDiscountToday();
+    }
+
+    // Mới: phân trang tất cả danh mục
+    @Override
+    public Page<Categories> getAllCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable);
+    }
+
+    // Mới: tìm kiếm theo tên danh mục + phân trang
+    @Override
+    public Page<Categories> searchCategoriesByName(String name, Pageable pageable) {
+        return categoryRepository.findByNameContainingIgnoreCase(name, pageable);
     }
 }

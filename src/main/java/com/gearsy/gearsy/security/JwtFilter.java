@@ -2,6 +2,7 @@ package com.gearsy.gearsy.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,16 +32,33 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        // 🔍 Nếu không có Authorization header, kiểm tra trong cookie
+        if (authHeader == null) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("Authorization".equals(cookie.getName())) {
+                        authHeader = "Bearer " + cookie.getValue(); // thêm prefix "Bearer "
+                        logger.info("JWT token found in cookie.");
+                        break;
+                    }
+                }
+            }
+        }
 
         try {
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                logger.info("No valid Authorization header or cookie found.");
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            final String jwt = authHeader.substring(7);
-            final String username = jwtUtils.extractUsername(jwt);
+            String jwt = authHeader.substring(7);
+            String username = jwtUtils.extractUsername(jwt);
+
+            logger.info("Extracted username: {}", username);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var userDetails = userDetailsService.loadUserByUsername(username);
@@ -53,12 +71,16 @@ public class JwtFilter extends OncePerRequestFilter {
                     );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    logger.info("🔐 Vai trò xác thực: {}", userDetails.getAuthorities());
+                    logger.info("✅ Token valid, user authenticated: {}", username);
+                } else {
+                    logger.warn("❌ Token invalid for user: {}", username);
                 }
             }
 
         } catch (Exception e) {
-            logger.error("JWT Filter error: {}", e.getMessage());
-            // Không throw để tránh chặn request công khai như /products/list
+            logger.error("❗ JWT Filter error: {}", e.getMessage());
+            // Không ném lỗi để không chặn truy cập các route public
         }
 
         filterChain.doFilter(request, response);
