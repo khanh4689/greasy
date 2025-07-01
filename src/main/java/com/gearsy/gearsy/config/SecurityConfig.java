@@ -46,24 +46,11 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // 🔒 Thêm phần này để xử lý redirect khi lỗi
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            // Khi token hết hạn hoặc chưa login → redirect tới login page
-                            response.sendRedirect("/auth/login");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            // Khi không đủ quyền → cũng redirect
-                            response.sendRedirect("/auth/login");
-                        })
-                )
-
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
 
     @Bean

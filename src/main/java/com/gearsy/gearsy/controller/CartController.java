@@ -36,7 +36,8 @@ public class CartController {
         model.addAttribute("items", items);
         model.addAttribute("title", "Giỏ hàng của bạn");
         model.addAttribute("total", total);
-        return "cart/view";
+        model.addAttribute("contentTemplate", "/cart/view");
+        return "layout";
     }
 
     @PostMapping("/add")

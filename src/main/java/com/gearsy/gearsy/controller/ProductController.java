@@ -62,7 +62,8 @@
             if (keyword == null || keyword.trim().isEmpty()) {
                 model.addAttribute("products", List.of());
                 model.addAttribute("message", "Vui lòng nhập từ khóa tìm kiếm.");
-                return "product/search-result";
+                model.addAttribute("contentTemplate", "product/search-result");
+                return "layout";
             }
 
             Page<ProductDTO> resultPage = productService.searchProducts(keyword, PageRequest.of(page, size));
@@ -70,8 +71,8 @@
             model.addAttribute("totalPages", resultPage.getTotalPages());
             model.addAttribute("currentPage", page);
             model.addAttribute("keyword", keyword);
-
-            return "product/search-result";
+            model.addAttribute("contentTemplate", "product/search-result");
+            return "layout";
         }
 
 
@@ -87,7 +88,8 @@
             model.addAttribute("totalPages", resultPage.getTotalPages());
             model.addAttribute("currentPage", page);
             model.addAttribute("categoryId", categoryId);
-            return "product/category-result"; // templates/product/category-result.html
+            model.addAttribute("contentTemplate", "product/category-result");
+            return "layout";
         }
 
 

@@ -26,4 +26,19 @@ public class Orders {
     private Boolean isHidden;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public Orders(Users user, BigDecimal totalAmount, LocalDateTime orderDate, String status,
+                  String shippingAddress, BigDecimal shippingFee, Boolean isHidden,
+                  LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.user = user;
+        this.totalAmount = totalAmount;
+        this.orderDate = orderDate;
+        this.status = status;
+        this.shippingAddress = shippingAddress;
+        this.shippingFee = shippingFee;
+        this.isHidden = isHidden;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
 }

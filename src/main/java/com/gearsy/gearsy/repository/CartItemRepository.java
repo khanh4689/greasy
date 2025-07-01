@@ -3,6 +3,7 @@ package com.gearsy.gearsy.repository;
 import com.gearsy.gearsy.entity.Cart_Items;
 import com.gearsy.gearsy.entity.Carts;
 import com.gearsy.gearsy.entity.Products;
+import com.gearsy.gearsy.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +18,7 @@ public interface CartItemRepository extends JpaRepository<Cart_Items, Long> {
     List<Cart_Items> findByCartWithProduct(@Param("cart") Carts cart);
 
     Optional<Cart_Items> findByCartAndProduct(Carts cart, Products product);
+    List<Cart_Items> findByCartUser(Users user);
+
+    void deleteByCart_User(Users user);
 }

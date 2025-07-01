@@ -11,8 +11,11 @@ import com.gearsy.gearsy.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import  org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +62,21 @@ public class CartServiceImpl implements CartService {
     public void removeItem(Long cartItemId) {
         cartItemRepository.deleteById(cartItemId);
     }
+
+    @Override
+    public BigDecimal calculateTotal(Users user) {
+        List<Cart_Items> items = cartItemRepository.findByCartUser(user);
+
+        return items.stream()
+                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transactional // 👉 Đây là điều bắt buộc
+    @Override
+    public void clearCart(Users user) {
+        cartItemRepository.deleteByCart_User(user);
+    }
+
 }
 
