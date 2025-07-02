@@ -122,6 +122,77 @@ public class ProductsServiceImpl implements ProductsService {
         return products.map(this::toProductDTO);
     }
 
+    @Override
+    public Page<ProductDTO> filterProductsByCategory(Long categoryId, BigDecimal minPrice,
+                                                     BigDecimal maxPrice, List<Long> supplierIds,
+                                                     Pageable pageable) {
+        Page<Products> products = productRepository.filterProducts(categoryId, minPrice, maxPrice, supplierIds, pageable);
+        return products.map(this::toProductDTO);
+    }
+
+    @Override
+    public Page<ProductDTO> filterProductsSortByPriceAsc(Long categoryId, BigDecimal minPrice,
+                                                         BigDecimal maxPrice, List<Long> supplierIds,
+                                                         Pageable pageable) {
+        Page<Products> products = productRepository.filterProductsOrderByPriceAsc(categoryId, minPrice, maxPrice, supplierIds, pageable);
+        return products.map(this::toProductDTO);
+    }
+
+    @Override
+    public Page<ProductDTO> filterProductsSortByPriceDesc(Long categoryId, BigDecimal minPrice,
+                                                          BigDecimal maxPrice, List<Long> supplierIds,
+                                                          Pageable pageable) {
+        Page<Products> products = productRepository.filterProductsOrderByPriceDesc(categoryId, minPrice, maxPrice, supplierIds, pageable);
+        return products.map(this::toProductDTO);
+    }
+
+    @Override
+    public Page<ProductDTO> getSortedProductsByCategory(Long categoryId, String sortType, Pageable pageable) {
+        Page<Products> products;
+
+        switch (sortType) {
+            case "cheapest":
+                products = productRepository.findCheapestInCategory(categoryId, pageable);
+                break;
+            case "expensive":
+                products = productRepository.findMostExpensiveInCategory(categoryId, pageable);
+                break;
+            case "newest":
+            default:
+                products = productRepository.findNewestInCategory(categoryId, pageable);
+                break;
+        }
+
+        return products.map(this::toProductDTO);
+    }
+
+    @Override
+    public Page<ProductDTO> getSortedProductsByKeyword(String keyword, String sortType, Pageable pageable) {
+        Page<Products> products;
+
+        switch (sortType) {
+            case "cheapest":
+                products = productRepository.searchByKeywordOrderByPriceAsc(keyword, pageable);
+                break;
+            case "expensive":
+                products = productRepository.searchByKeywordOrderByPriceDesc(keyword, pageable);
+                break;
+            case "newest":
+            default:
+                products = productRepository.searchByKeywordOrderByCreatedAtDesc(keyword, pageable);
+                break;
+        }
+
+        return products.map(this::toProductDTO);
+    }
+
+
+
+
+
+
+
+
 
 }
 

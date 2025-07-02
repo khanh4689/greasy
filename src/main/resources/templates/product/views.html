@@ -1,23 +1,42 @@
 <div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
     <div class="container my-4">
 
-        <!-- Danh mục khuyến mãi hôm nay -->
+        <!-- 🔥 Danh mục khuyến mãi hôm nay -->
         <div class="row mb-5">
             <div class="col-12">
-                <h5 class="text-danger mb-3">
-                    <i class="bi bi-stars me-1"></i> Danh mục khuyến mãi hôm nay
-                </h5>
-                <div th:if="${#lists.isEmpty(discountedCategories)}">
+                <h2 class="text-white bg-danger px-4 py-2 rounded-3 d-inline-block shadow">
+                    <i class="bi bi-fire me-2"></i>Khuyến mãi siêu hot hôm nay!
+                </h2>
+
+                <!-- Khi không có danh mục khuyến mãi -->
+                <div th:if="${#lists.isEmpty(discountedCategories)}" class="mt-3">
                     <p class="text-muted">Hiện không có danh mục nào đang được khuyến mãi.</p>
                 </div>
-                <div th:if="${!#lists.isEmpty(discountedCategories)}" class="d-flex flex-wrap gap-3">
-                    <div th:each="dc : ${discountedCategories}" class="border rounded bg-warning bg-opacity-25 text-dark p-3 d-flex flex-column align-items-center text-center" style="min-width: 160px;">
+
+                <!-- Khi có danh mục khuyến mãi -->
+                <div th:if="${!#lists.isEmpty(discountedCategories)}" class="mt-4 d-flex flex-wrap gap-4">
+                    <div th:each="dc : ${discountedCategories}"
+                         class="promo-card border-0 rounded-4 bg-dark text-white shadow-lg position-relative p-3 d-flex flex-column align-items-center justify-content-center text-center"
+                         style="width: 180px; height: 240px; background-image: linear-gradient(to bottom right, #ff4d4d, #8b0000);">
+
+                        <!-- 🔖 Ribbon giảm giá -->
+                        <div class="ribbon bg-warning text-dark fw-bold position-absolute top-0 start-0 px-2 py-1 rounded-end">
+                            Giảm <span th:text="${dc.maxDiscountToday + '%'}">%</span>
+                        </div>
+
+                        <!-- 🖼️ Ảnh danh mục -->
                         <img th:if="${dc.images != null}"
                              th:src="@{/images/{img}(img=${dc.images})}"
-                             alt="Category Image" width="80" height="80" class="mb-2"/>
-                        <span th:text="${dc.categoryName}" class="fw-bold mb-1">Danh mục</span>
-                        <span>Giảm <strong th:text="${dc.maxDiscountToday + '%'}">%</strong></span>
-                        <small class="countdown text-muted" th:attr="data-end=${dc.endDateAsString}">còn lại...</small>
+                             alt="Category Image"
+                             class="rounded-circle border border-3 border-white mb-3"
+                             style="width: 80px; height: 80px; object-fit: cover;"/>
+
+                        <!-- 📛 Tên danh mục -->
+                        <h6 class="fw-bold text-white mb-2" th:text="${dc.categoryName}">Danh mục</h6>
+
+                        <!-- ⏳ Countdown -->
+                        <span class="countdown badge bg-light text-dark px-3 py-1 rounded-pill small"
+                              th:attr="data-end=${dc.endDateAsString}">còn lại...</span>
                     </div>
                 </div>
             </div>
@@ -135,6 +154,28 @@
             </div>
         </div>
     </div>
+
+    <!-- 💅 CSS bổ sung -->
+    <style>
+    .promo-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .promo-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+    }
+
+    .ribbon {
+        font-size: 0.8rem;
+        z-index: 10;
+    }
+
+    .countdown {
+        margin-top: auto;
+        font-family: monospace;
+    }
+</style>
 
     <!-- Countdown Script -->
     <script>

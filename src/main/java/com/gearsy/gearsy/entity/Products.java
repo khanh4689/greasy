@@ -28,5 +28,9 @@ public class Products {
     private Categories category;
     @OneToMany(mappedBy = "product")
     private List<ProductPromotions> productPromotions;
+    @ManyToOne
+    @JoinColumn(name = "supplierId")
+    private Suppliers supplier;
+
 
 }

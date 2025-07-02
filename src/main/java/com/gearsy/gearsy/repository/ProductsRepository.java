@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -45,10 +46,97 @@ public interface ProductsRepository extends JpaRepository<Products, Long> {
 
     // ✅ Thêm điều kiện hidden = false
     Page<Products> findByCategory_CategoryIdAndHiddenFalse(Long categoryId, Pageable pageable);
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false
+      AND p.category.categoryId = :categoryId
+      AND (:minPrice IS NULL OR p.price >= :minPrice)
+      AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+      AND (:supplierIds IS NULL OR p.supplier.supplierId IN :supplierIds)
+""")
+    Page<Products> filterProducts(@Param("categoryId") Long categoryId,
+                                  @Param("minPrice") BigDecimal minPrice,
+                                  @Param("maxPrice") BigDecimal maxPrice,
+                                  @Param("supplierIds") List<Long> supplierIds,
+                                  Pageable pageable);
+
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false
+      AND p.category.categoryId = :categoryId
+      AND (:minPrice IS NULL OR p.price >= :minPrice)
+      AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+      AND (:supplierIds IS NULL OR p.supplier.supplierId IN :supplierIds)
+    ORDER BY p.price ASC
+""")
+    Page<Products> filterProductsOrderByPriceAsc(@Param("categoryId") Long categoryId,
+                                                 @Param("minPrice") BigDecimal minPrice,
+                                                 @Param("maxPrice") BigDecimal maxPrice,
+                                                 @Param("supplierIds") List<Long> supplierIds,
+                                                 Pageable pageable);
 
 
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false
+      AND p.category.categoryId = :categoryId
+      AND (:minPrice IS NULL OR p.price >= :minPrice)
+      AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+      AND (:supplierIds IS NULL OR p.supplier.supplierId IN :supplierIds)
+    ORDER BY p.price DESC
+""")
+    Page<Products> filterProductsOrderByPriceDesc(@Param("categoryId") Long categoryId,
+                                                  @Param("minPrice") BigDecimal minPrice,
+                                                  @Param("maxPrice") BigDecimal maxPrice,
+                                                  @Param("supplierIds") List<Long> supplierIds,
+                                                  Pageable pageable);
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false AND p.category.categoryId = :categoryId
+    ORDER BY p.createdAt DESC
+""")
+    Page<Products> findNewestInCategory(@Param("categoryId") Long categoryId, Pageable pageable);
 
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false AND p.category.categoryId = :categoryId
+    ORDER BY p.price ASC
+""")
+    Page<Products> findCheapestInCategory(@Param("categoryId") Long categoryId, Pageable pageable);
 
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false AND p.category.categoryId = :categoryId
+    ORDER BY p.price DESC
+""")
+    Page<Products> findMostExpensiveInCategory(@Param("categoryId") Long categoryId, Pageable pageable);
+
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false AND 
+          (LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) 
+          OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    ORDER BY p.createdAt DESC
+""")
+    Page<Products> searchByKeywordOrderByCreatedAtDesc(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false AND 
+          (LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) 
+          OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    ORDER BY p.price ASC
+""")
+    Page<Products> searchByKeywordOrderByPriceAsc(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+    SELECT p FROM Products p
+    WHERE p.hidden = false AND 
+          (LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) 
+          OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    ORDER BY p.price DESC
+""")
+    Page<Products> searchByKeywordOrderByPriceDesc(@Param("keyword") String keyword, Pageable pageable);
 
 
 }
