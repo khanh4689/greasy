@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Thêm/Sửa danh mục</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- Header -->
+<nav class="navbar navbar-dark bg-dark px-4">
+  <span class="navbar-brand mb-0 h1">🛠️ Quản lý danh mục</span>
+</nav>
+
+<!-- Form Container -->
+<div class="container my-5">
+  <div class="card shadow-sm mx-auto" style="max-width: 600px;">
+    <div class="card-body">
+      <h3 class="card-title text-center mb-4"
+          th:text="${category.categoryId != null} ? '✏️ Sửa danh mục' : '➕ Thêm danh mục'"></h3>
+
+      <!-- Hiển thị lỗi -->
+      <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+      <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+      <!-- Form chính -->
+      <form th:action="@{/admin/categories/save}" th:object="${category}" method="post" enctype="multipart/form-data">
+        <input type="hidden" th:field="*{categoryId}"/>
+
+        <!-- Tên danh mục -->
+        <div class="mb-3">
+          <label class="form-label">Tên danh mục</label>
+          <input type="text" th:field="*{name}" class="form-control" required placeholder="Nhập tên danh mục">
+        </div>
+
+        <!-- Nhà cung cấp -->
+        <div class="mb-3">
+          <label class="form-label">Nhà cung cấp</label>
+          <select th:field="*{supplier}" class="form-select">
+            <option value="">-- Chọn nhà cung cấp --</option>
+            <option th:each="supplier : ${suppliers}"
+                    th:value="${supplier.supplierId}"
+                    th:text="${supplier.name}"
+                    th:selected="${category.supplier != null and category.supplier.supplierId == supplier.supplierId}">
+            </option>
+          </select>
+        </div>
+
+        <!-- Upload ảnh -->
+        <div class="mb-3">
+          <label class="form-label">Ảnh danh mục</label>
+          <input type="file" name="imageFile" class="form-control" accept="image/*">
+
+          <!-- Preview ảnh nếu có -->
+          <div th:if="${category.images != null}" class="mt-2">
+            <img th:src="@{/images/{img}(img=${category.images})}"
+                 alt="Preview ảnh"
+                 width="100"
+                 class="rounded border">
+          </div>
+        </div>
+
+        <!-- Nút lưu -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Lưu
+          </button>
+        </div>
+      </form>
+
+      <!-- Quay lại danh sách -->
+      <div class="text-center mt-3">
+        <a th:href="@{/admin/categories}" class="btn btn-link text-decoration-none">
+          <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-3 mt-5">
+  <small>© 2025 Admin Dashboard. All rights reserved.</small>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

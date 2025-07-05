@@ -37,6 +37,8 @@ public interface ProductsService {
 
     Page<ProductDTO> getSortedProductsByKeyword(String keyword, String sortType, Pageable pageable);
 
+    Products getProductById(Long productId);
+
 
 
 }
