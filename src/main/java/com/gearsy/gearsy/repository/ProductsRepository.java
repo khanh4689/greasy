@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -25,7 +26,7 @@ public interface ProductsRepository extends JpaRepository<Products, Long> {
 
     @Query("""
     SELECT p FROM Products p
-    WHERE p.hidden = FALSE AND p.stock > 5
+    WHERE p.hidden = FALSE AND p.stock > 1
     ORDER BY p.stock DESC
 """)
     Page<Products> findFeaturedProducts(Pageable pageable);
@@ -137,6 +138,15 @@ public interface ProductsRepository extends JpaRepository<Products, Long> {
     ORDER BY p.price DESC
 """)
     Page<Products> searchByKeywordOrderByPriceDesc(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+    SELECT DISTINCT p FROM Products p
+    LEFT JOIN FETCH p.productPromotions pp
+    LEFT JOIN FETCH pp.promotion promo
+    WHERE p.productId = :productId
+      AND (promo.status = 'ACTIVE' OR promo IS NULL)
+""")
+    Optional<Products> findProductWithActivePromotionById(@Param("productId") Long productId);
 
 
 }

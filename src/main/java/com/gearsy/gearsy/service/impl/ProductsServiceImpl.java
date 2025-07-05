@@ -186,6 +186,13 @@ public class ProductsServiceImpl implements ProductsService {
         return products.map(this::toProductDTO);
     }
 
+    @Override
+    public Products getProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + productId));
+    }
+
+
 
 
 

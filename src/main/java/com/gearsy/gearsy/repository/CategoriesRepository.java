@@ -26,6 +26,8 @@ public interface CategoriesRepository extends JpaRepository<Categories, Long> {
 
     // Phân trang + tìm kiếm theo tên danh mục
     Page<Categories> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    List<Categories> findByHiddenFalse();
 }
 
 
