@@ -20,6 +20,19 @@ public class Suppliers {
     private String address;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean hidden;
+
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
 
 

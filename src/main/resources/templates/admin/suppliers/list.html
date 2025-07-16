@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Supplier List</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div class="container my-4">
+  <h2 class="mb-4">Danh sách nhà cung cấp</h2>
+
+  <!-- Thông báo thành công/thất bại -->
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+  <form th:action="@{/admin/suppliers}" method="get" class="row g-3 mb-4">
+    <div class="col-auto">
+      <input type="text" name="name" th:value="${name}" class="form-control" placeholder="Tìm theo tên nhà cung cấp">
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+    </div>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Tên</th>
+        <th>Email</th>
+        <th>Điện thoại</th>
+        <th>Địa chỉ</th>
+        <th>Ngày tạo</th>
+        <th>Ngày cập nhật</th>
+        <th>Hành động</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="supplier : ${suppliersPage.content}">
+        <td th:text="${supplier.supplierId}">1</td>
+        <td th:text="${supplier.name}">Asus</td>
+        <td th:text="${supplier.contactEmail}">email</td>
+        <td th:text="${supplier.contactPhone}">phone</td>
+        <td th:text="${supplier.address}">address</td>
+        <td th:text="${#temporals.format(supplier.createdAt, 'dd/MM/yyyy')}">createdAt</td>
+        <td th:text="${#temporals.format(supplier.updatedAt, 'dd/MM/yyyy')}">updatedAt</td>
+        <td class="text-nowrap">
+          <a th:href="@{/admin/suppliers/edit/{id}(id=${supplier.supplierId})}" class="btn btn-sm btn-warning" title="Sửa">
+            <i class="bi bi-pencil-square"></i>
+          </a>
+          <a th:href="@{/admin/suppliers/delete/{id}(id=${supplier.supplierId})}"
+             class="btn btn-sm btn-danger"
+             onclick="return confirm('Bạn có chắc muốn xóa?')" title="Xóa">
+            <i class="bi bi-trash"></i>
+          </a>
+          <a th:href="@{/toggle-hidden/{id}(id=${supplier.supplierId})}"
+             th:classappend="${supplier.hidden} ? 'btn-secondary' : 'btn-outline-secondary'"
+             class="btn btn-sm"
+             th:title="${supplier.hidden} ? 'Hiện nhà cung cấp' : 'Ẩn nhà cung cấp'">
+            <i class="bi" th:classappend="${supplier.hidden} ? 'bi-eye-slash' : 'bi-eye'"></i>
+          </a>
+        </td>
+      </tr>
+      <tr th:if="${suppliersPage.content.empty}">
+        <td colspan="8" class="text-center text-muted">Không tìm thấy nhà cung cấp nào.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+      <span>Trang [[${currentPage}]] / [[${suppliersPage.totalPages}]]</span>
+    </div>
+    <div>
+      <a th:if="${currentPage > 1}"
+         th:href="@{/admin/suppliers(page=${currentPage-1}, name=${name})}"
+         class="btn btn-outline-secondary btn-sm me-2">Trước</a>
+      <a th:if="${currentPage < suppliersPage.totalPages}"
+         th:href="@{/admin/suppliers(page=${currentPage+1}, name=${name})}"
+         class="btn btn-outline-secondary btn-sm">Sau</a>
+    </div>
+    <div>
+      <a th:href="@{/admin/suppliers/add}" class="btn btn-success btn-sm">Thêm nhà cung cấp</a>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
