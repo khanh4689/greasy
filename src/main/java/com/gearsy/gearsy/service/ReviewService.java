@@ -11,8 +11,16 @@ public interface ReviewService {
 
     void updateReview(Long reviewId, int rating, String comment, String userEmail);
 
-    void deleteReview(Long reviewId, String email);
+    void deleteReviewByEmail(Long reviewId, String email);
 
     Optional<Reviews> getReviewByIdAndUserEmail(Long reviewId, String userEmail);
+
+    void hideReview(Long reviewId);
+    void deleteReview(Long reviewId);
+    List<Reviews> getAllVisibleReviews();
+
+    public List<Reviews> getAllReviews();
+
+    List<Reviews> searchReviews(String keyword);
 
 }

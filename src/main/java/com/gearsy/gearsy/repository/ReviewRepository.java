@@ -18,4 +18,15 @@ public interface ReviewRepository extends JpaRepository<Reviews, Long> {
     Optional<Reviews> findByReviewIdAndUser_Email(Long reviewId, String email);
 
     Optional<Reviews> findByReviewIdAndUserEmail(Long reviewId, String userEmail);
+
+    List<Reviews> findAllByOrderByReviewIdAsc();
+    List<Reviews> findAllByStatusOrderByReviewIdAsc(String status);
+
+    @Query("SELECT r FROM Reviews r " +
+            "WHERE LOWER(r.user.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(r.product.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(r.comment) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Reviews> searchByKeyword(@Param("keyword") String keyword);
+
+
 }
