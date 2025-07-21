@@ -26,7 +26,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String loginSubmit(@ModelAttribute AuthRequest authRequest, HttpServletResponse response, Model model) {
+    public String loginSubmit(@ModelAttribute AuthRequest authRequest,
+                              HttpServletResponse response,
+                              Model model) {
         try {
             AuthResponse authResponse = authService.login(authRequest);
 
@@ -37,11 +39,20 @@ public class AuthController {
             response.addCookie(jwtCookie);
 
             return "redirect:/products/list";
+        } catch (IllegalArgumentException e) {
+            // Lỗi xác thực logic như sai tài khoản, mật khẩu
+            model.addAttribute("error", e.getMessage());
         } catch (Exception e) {
-            model.addAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            return "auth/login";
+            // Lỗi hệ thống không xác định
+            model.addAttribute("error", "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau.");
         }
+
+        // Giữ lại email để người dùng không cần nhập lại
+        model.addAttribute("authRequest", authRequest);
+
+        return "auth/login";
     }
+
 
 
 

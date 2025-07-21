@@ -28,6 +28,10 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.findByProductIdWithUser(productId);
     }
 
+    public List<Reviews> getAllReviews() {
+        return reviewRepository.findAllByOrderByReviewIdAsc();
+    }
+
     @Override
     public void submitReview(Long productId, int rating, String comment, String userEmail) {
         Users user = usersRepository.findByEmail(userEmail)
@@ -56,7 +60,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteReview(Long reviewId, String email) {
+    public void deleteReviewByEmail(Long reviewId, String email) {
         Reviews rv = reviewRepository.findByReviewIdAndUser_Email(reviewId,email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy review của bạn"));
         reviewRepository.delete(rv);
@@ -66,4 +70,31 @@ public class ReviewServiceImpl implements ReviewService {
     public Optional<Reviews> getReviewByIdAndUserEmail(Long reviewId, String userEmail) {
         return reviewRepository.findByReviewIdAndUserEmail(reviewId, userEmail);
     }
+
+    @Override
+    public void hideReview(Long reviewId) {
+        Reviews review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy bình luận với ID: " + reviewId));
+        // Chuyển đổi trạng thái
+        review.setStatus(review.getStatus().equals("VISIBLE") ? "HIDDEN" : "VISIBLE");
+        review.setUpdatedAt(LocalDateTime.now());
+        reviewRepository.save(review);
+    }
+
+    @Override
+    public void deleteReview(Long reviewId) {
+        Reviews review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy bình luận với ID: " + reviewId));
+        reviewRepository.delete(review);
+    }
+
+    public List<Reviews> getAllVisibleReviews() {
+        return reviewRepository.findAllByStatusOrderByReviewIdAsc("VISIBLE");
+    }
+
+    @Override
+    public List<Reviews> searchReviews(String keyword) {
+        return reviewRepository.searchByKeyword(keyword);
+    }
+
 }

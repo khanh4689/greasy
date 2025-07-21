@@ -190,7 +190,7 @@ public class ProductController {
                                @RequestParam Long productId,
                                Principal principal) {
         if (principal == null) return "redirect:/auth/login";
-        reviewService.deleteReview(reviewId, principal.getName());
+        reviewService.deleteReviewByEmail(reviewId, principal.getName());
         return "redirect:/products/detail/" + productId;
     }
 }
