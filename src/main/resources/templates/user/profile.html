@@ -1,0 +1,130 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+  <div class="container mt-5">
+
+    <h2 class="text-center text-primary mb-4">
+      <i th:class="'bi me-2 ' + (${editMode} ? 'bi-pencil-square' : 'bi-person-circle')"></i>
+      <span th:text="${editMode} ? 'Chỉnh sửa thông tin' : 'Thông tin cá nhân'"></span>
+    </h2>
+
+    <!-- FORM CHỈNH SỬA -->
+    <form th:if="${editMode}" th:action="@{/user/profile/edit}" th:object="${userUpdateDTO}" method="post" enctype="multipart/form-data">
+      <div class="mb-3 text-center">
+        <img th:src="${user.avatar != null} ? ${user.avatar} : '/images/default-avatar.png'"
+             class="rounded-circle shadow"
+             alt="Avatar"
+             width="130" height="130">
+        <div class="mt-2">
+          <input type="file" name="avatarFile" class="form-control" accept="image/*">
+        </div>
+      </div>
+
+      <!-- Các trường còn lại -->
+      <div class="mb-3">
+        <label for="name">Họ tên</label>
+        <input type="text" class="form-control" id="name" th:field="*{name}" />
+      </div>
+      <div class="mb-3">
+        <label for="phone">Số điện thoại</label>
+        <input type="text" class="form-control" id="phone" th:field="*{phone}" />
+      </div>
+      <div class="mb-3">
+        <label for="address">Địa chỉ</label>
+        <input type="text" class="form-control" id="address" th:field="*{address}" />
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-save me-1"></i> Cập nhật
+        </button>
+        <a th:href="@{/user/profile}" class="btn btn-secondary ms-2">
+          <i class="bi bi-arrow-left-circle me-1"></i> Hủy
+        </a>
+      </div>
+    </form>
+
+    <!-- CHẾ ĐỘ XEM THÔNG TIN -->
+    <div th:unless="${editMode}" class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow rounded-4 border-0">
+          <div class="card-body p-4">
+            <div class="text-center mb-4">
+              <img th:src="${user.avatar != null} ? ${user.avatar} : '/images/default-avatar.png'"
+                   alt="Avatar"
+                   class="rounded-circle shadow"
+                   width="130" height="130">
+            </div>
+
+            <ul class="list-group list-group-flush fs-5">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <i class="bi bi-person-fill text-primary me-2"></i>
+                <span class="text-end fw-medium" th:text="${user.name}">Tên</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <i class="bi bi-envelope-fill text-primary me-2"></i>
+                <span class="text-end fw-medium" th:text="${user.email}">Email</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <i class="bi bi-telephone-fill text-primary me-2"></i>
+                <span class="text-end fw-medium" th:text="${user.phone}">Số điện thoại</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                <span class="text-end fw-medium" th:text="${user.address}">Địa chỉ</span>
+              </li>
+            </ul>
+
+            <div class="mt-4 text-center">
+              <a th:href="@{/user/profile?edit=true}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa thông tin
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ĐƠN HÀNG -->
+  <div class="container mt-5" th:if="${!editMode}">
+    <h3 class="text-center text-primary mb-4">
+      <i class="bi bi-card-list me-2"></i> Đơn hàng của bạn
+    </h3>
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light text-center">
+        <tr>
+          <th>Mã đơn</th>
+          <th>Ngày đặt</th>
+          <th>Tổng tiền</th>
+          <th>Trạng thái</th>
+          <th>Địa chỉ</th>
+          <th>Phí ship</th>
+          <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}" class="align-middle">
+          <td th:text="${order.orderId}"></td>
+          <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
+          <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')} + ' đ'"></td>
+          <td th:text="${order.status}"></td>
+          <td th:text="${order.shippingAddress}"></td>
+          <td th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 2, 'POINT')} + ' đ'"></td>
+          <td class="text-center">
+            <form th:action="@{'/user/profile/order/delete/' + ${order.orderId}}" method="post"
+                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa đơn này?');">
+              <button class="btn btn-danger btn-sm">
+                <i class="bi bi-trash"></i> Xóa
+              </button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

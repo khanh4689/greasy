@@ -10,6 +10,7 @@ import java.util.List;
 public interface OrderService {
     void processCODPayment(Long orderId);
     void updateProductStock(Orders order);
-
     Orders createOrderFromCart(Users user, List<Cart_Items> cartItems, String fullAddress, BigDecimal total);
+    List<Orders> getOrdersByUserEmail(String email);
+    void deleteOrderById(Long id);
 }
