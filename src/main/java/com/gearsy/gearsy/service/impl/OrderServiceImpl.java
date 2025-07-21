@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailsRepository orderDetailsRepo;
     private final PaymentRepository paymentsRepo;
     private final CartItemRepository cartItemRepository;
+    private final UsersRepository usersRepository;
 
     @Transactional
     @Override
@@ -85,6 +87,27 @@ public class OrderServiceImpl implements OrderService {
         cartItemRepository.deleteAll(cartItems);
 
         return savedOrder;
+    }
+
+    @Override
+    public List<Orders> getOrdersByUserEmail(String email) {
+        Users user = usersRepository.findByEmail(email).orElseThrow();
+        return ordersRepo.findAllByUser(user);
+    }
+
+    @Override
+    public void deleteOrderById(Long id) {
+        // Lấy đối tượng Orders trước
+        Optional<Orders> optionalOrder = ordersRepo.findById(id);
+        if (optionalOrder.isPresent()) {
+            Orders order = optionalOrder.get();
+            // Xóa các OrderDetails liên quan đến Order
+            orderDetailsRepo.deleteByOrder(order);
+            // Xóa Order
+            ordersRepo.deleteById(id);
+        } else {
+            throw new RuntimeException("Không tìm thấy đơn hàng với ID: " + id);
+        }
     }
 }
 
