@@ -1,0 +1,186 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+  <div class="container profile-container mt-5">
+
+    <!-- Tiêu đề -->
+    <h2 class="profile-title text-center text-primary mb-4">
+      <i th:class="'bi me-2 fs-3 ' + (${editMode} ? 'bi-pencil-square' : 'bi-person-circle')"></i>
+      <span th:text="${editMode} ? #{user.profile.edit.title} : #{user.profile.view.title}"></span>
+    </h2>
+
+    <!-- FORM CHỈNH SỬA -->
+    <form th:if="${editMode}"
+          th:action="@{/user/profile/edit}"
+          th:object="${userUpdateDTO}"
+          method="post"
+          enctype="multipart/form-data"
+          class="row justify-content-center profile-form">
+
+      <!-- CSRF Token -->
+
+      <div class="col-md-8 col-lg-6 card profile-card shadow rounded-4 border-0 p-4">
+
+        <!-- Avatar -->
+        <div class="mb-3 text-center profile-avatar">
+          <img th:src="${user.avatar != null} ? ${user.avatar} : '/images/default-avatar.png'"
+               class="rounded-circle shadow-sm border border-2 border-primary"
+               alt="Avatar"
+               width="130" height="130">
+          <div class="mt-3">
+            <input type="file" name="avatarFile" class="form-control" accept="image/*" />
+          </div>
+        </div>
+
+        <!-- Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label fw-semibold" th:text="#{user.profile.label.name}">Họ tên</label>
+          <input type="text" class="form-control" id="name" th:field="*{name}" />
+        </div>
+
+        <!-- Phone + Gửi OTP -->
+        <div class="mb-3">
+          <label for="phone" class="form-label fw-semibold">Số điện thoại</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="phone" th:field="*{phone}" />
+            <button class="btn btn-outline-primary"
+                    type="submit"
+                    formaction="/user/otp/send"
+                    formmethod="post">Gửi OTP</button>
+          </div>
+        </div>
+
+        <!-- OTP + Xác minh -->
+        <div class="mb-3">
+          <label for="otp" class="form-label fw-semibold">Mã OTP</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="otp" name="otp" />
+            <button class="btn btn-success"
+                    type="submit"
+                    formaction="/user/otp/verify"
+                    formmethod="post">Xác minh</button>
+          </div>
+        </div>
+
+        <!-- Thông báo -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
+
+        <!-- Address -->
+        <div class="mb-3">
+          <label for="address" class="form-label fw-semibold" th:text="#{user.profile.label.address}">Địa chỉ</label>
+          <input type="text" class="form-control" id="address" th:field="*{address}" />
+        </div>
+
+        <!-- Nút hành động -->
+        <div class="text-center mt-3">
+          <button type="submit" class="btn btn-success profile-btn px-4">
+            <i class="bi bi-save me-1"></i>
+            <span th:text="#{user.profile.button.update}">Cập nhật</span>
+          </button>
+          <a th:href="@{/user/profile}" class="btn btn-secondary profile-btn-secondary ms-2 px-4">
+            <i class="bi bi-x-circle me-1"></i>
+            <span th:text="#{user.profile.button.cancel}">Hủy</span>
+          </a>
+        </div>
+      </div>
+    </form>
+
+
+    <!-- CHẾ ĐỘ XEM -->
+    <div th:unless="${editMode}" class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card profile-card shadow rounded-4 border-0 p-4">
+          <div class="text-center mb-3 profile-avatar">
+            <img th:src="${user.avatar != null} ? ${user.avatar} : '/images/default-avatar.png'"
+                 class="rounded-circle border border-3 border-primary shadow"
+                 width="130" height="130" alt="Avatar" />
+          </div>
+
+          <ul class="list-group list-group-flush fs-5 profile-list-group">
+            <li class="list-group-item profile-list-group-item d-flex justify-content-between align-items-center">
+              <i class="bi bi-person-fill text-primary"></i>
+              <span class="fw-medium text-end" th:text="${user.name}">Tên</span>
+            </li>
+            <li class="list-group-item profile-list-group-item d-flex justify-content-between align-items-center">
+              <i class="bi bi-envelope-fill text-primary"></i>
+              <span class="fw-medium text-end" th:text="${user.email}">Email</span>
+            </li>
+            <li class="list-group-item profile-list-group-item d-flex justify-content-between align-items-center">
+              <i class="bi bi-telephone-fill text-primary"></i>
+              <div class="d-flex flex-column text-end">
+                <span class="fw-medium" th:text="${user.phone}">Số điện thoại</span>
+                <span th:if="${user.phoneVerified}" class="badge bg-success mt-1">Đã xác minh</span>
+                <span th:unless="${user.phoneVerified}" class="badge bg-danger mt-1">Chưa xác minh</span>
+              </div>
+            </li>
+            <li class="list-group-item profile-list-group-item d-flex justify-content-between align-items-center">
+              <i class="bi bi-geo-alt-fill text-primary"></i>
+              <span class="fw-medium text-end" th:text="${user.address}">Địa chỉ</span>
+            </li>
+          </ul>
+
+          <div class="text-center mt-4">
+            <a th:href="@{/user/profile?edit=true}" class="btn btn-outline-primary profile-btn-outline-primary px-4">
+              <i class="bi bi-pencil-square me-1"></i> <span th:text="#{user.profile.button.edit}">Chỉnh sửa thông tin</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ĐƠN HÀNG -->
+    <div class="mt-5" th:if="${!editMode}">
+      <h3 class="text-center text-primary mb-4">
+        <i class="bi bi-card-list me-2"></i> <span th:text="#{user.orders.title}">Đơn hàng của bạn</span>
+      </h3>
+
+      <div class="table-responsive profile-table-responsive">
+        <table class="table table-hover align-middle shadow-sm rounded-3 overflow-hidden profile-table">
+          <thead class="table-primary text-center">
+          <tr>
+            <th th:text="#{user.orders.header.orderId}">Mã đơn</th>
+            <th th:text="#{user.orders.header.orderDate}">Ngày đặt</th>
+            <th th:text="#{user.orders.header.totalAmount}">Tổng tiền</th>
+            <th th:text="#{user.orders.header.status}">Trạng thái</th>
+            <th th:text="#{user.orders.header.shippingAddress}">Địa chỉ</th>
+            <th th:text="#{user.orders.header.shippingFee}">Phí ship</th>
+            <th th:text="#{user.orders.header.actions}">Hành động</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="order : ${orders}">
+            <td th:text="${order.orderId}"></td>
+            <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
+            <td>
+                <span class="text-success fw-semibold"
+                      th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')} + ' đ'"></span>
+            </td>
+            <td>
+                <span th:class="'badge px-3 py-2 ' +
+                  (${order.status} == #{order.status.delivered} ? 'bg-success' :
+                   (${order.status} == #{order.status.pending} ? 'bg-warning text-dark' : 'bg-secondary'))"
+                      th:text="${order.status}"></span>
+            </td>
+            <td th:text="${order.shippingAddress}"></td>
+            <td th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 2, 'POINT')} + ' đ'"></td>
+            <td class="text-center">
+              <a th:href="@{'/user/invoice/' + ${order.orderId}}"
+                 class="btn btn-outline-primary btn-sm px-3">
+                <i class="bi bi-eye me-1"></i>
+              </a>
+              <form th:if="${order.status == 'PENDING'}"
+                    th:action="@{'/user/profile/order/delete/' + ${order.orderId}}"
+                    method="post"
+                    onsubmit="return confirm(#{user.orders.confirm.delete});">
+                <button class="btn btn-outline-danger btn-sm px-3">
+                  <i class="bi bi-trash me-1"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

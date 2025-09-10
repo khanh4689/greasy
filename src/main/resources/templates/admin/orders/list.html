@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quản lý đơn hàng</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      height: 100vh;
+      width: 220px;
+      background-color: #343a40;
+      color: white;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 1rem;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar .nav-link {
+      color: white;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .sidebar .nav-link i {
+      margin-right: 8px;
+    }
+
+    .sidebar .nav-link:hover {
+      background-color: #495057;
+    }
+
+    .main {
+      padding-left: 220px;
+      padding-right: 1rem;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+      transition: padding-left 0.3s;
+    }
+
+    .main.collapsed {
+      padding-left: 70px;
+    }
+
+    footer {
+      background-color: #212529;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+      border-radius: 0.5rem;
+    }
+
+    .table-responsive { box-shadow: 0 0 10px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
+    .order-id { font-weight: 600; color: #0d6efd; }
+    .price { color: #198754; font-weight: 600; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
+    .status-visible { background-color: #d1e7dd; color: #0f5132; }
+    .status-hidden  { background-color: #f8d7da; color: #842029; }
+    .address { max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .actions form { display: inline-block; }
+    .table td, .table th { vertical-align: middle !important; }
+
+    @media (max-width: 768px) {
+      .table th, .table td {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+      }
+
+      .main {
+        padding-left: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<!-- Sidebar -->
+<div id="sidebar" class="sidebar">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <span class="fs-5 fw-bold">Admin</span>
+    <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()">
+      <i class="bi bi-list"></i>
+    </button>
+  </div>
+  <ul class="nav flex-column">
+    <li class="nav-item"><a class="nav-link" th:href="@{/admin/categories}"><i class="bi bi-folder2"></i> Danh mục</a></li>
+    <li class="nav-item"><a class="nav-link" th:href="@{/admin/orders}"><i class="bi bi-bag-check"></i> Đơn hàng</a></li>
+    <li class="nav-item"><a class="nav-link" th:href="@{/admin/products/list}"><i class="bi bi-box"></i> Sản phẩm</a></li>
+    <li class="nav-item"><a class="nav-link" th:href="@{/admin/promotions/list}"><i class="bi bi-percent"></i> Khuyến mãi</a></li>
+    <li class="nav-item"><a class="nav-link" th:href="@{/admin/reviews}"><i class="bi bi-chat-left-text"></i> Đánh giá</a></li>
+    <li class="nav-item"><a class="nav-link" th:href="@{/admin/suppliers}"><i class="bi bi-truck"></i> Nhà cung cấp</a></li>
+  </ul>
+</div>
+
+<!-- Main content -->
+<div id="main" class="main">
+  <div class="container-fluid">
+    <!-- Header -->
+    <h2 class="mb-4 text-primary text-center">
+      <i class="bi bi-card-checklist me-2"></i> Quản lý đơn hàng
+    </h2>
+
+    <!-- Table -->
+    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+      <table class="table table-hover align-middle">
+        <thead class="table-light text-center">
+        <tr>
+          <th>ID</th>
+          <th>Người dùng</th>
+          <th>Tổng tiền</th>
+          <th>Ngày đặt</th>
+          <th>Trạng thái</th>
+          <th>Địa chỉ</th>
+          <th>Hiển thị</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+          <td class="order-id text-center" th:text="${order.orderId}"></td>
+          <td th:text="${order.user.name}"></td>
+          <td class="price text-end" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')} + ' đ'"></td>
+          <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
+
+          <!-- TRẠNG THÁI -->
+          <td>
+            <form th:action="@{'/admin/orders/' + ${order.orderId} + '/update-status'}" method="post" class="d-inline">
+              <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option th:value="PENDING" th:selected="${order.status == 'PENDING'}">🕓 Chờ xử lý</option>
+                <option th:value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">🔄 Đang xử lý</option>
+                <option th:value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">🚚 Đã giao</option>
+                <option th:value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">❌ Đã hủy</option>
+              </select>
+            </form>
+          </td>
+
+          <!-- ĐỊA CHỈ -->
+          <td class="address" th:title="${order.shippingAddress}" th:text="${order.shippingAddress}"></td>
+
+          <!-- HIỂN THỊ -->
+          <td class="text-center">
+            <span th:class="${order.isHidden} ? 'status-badge status-hidden' : 'status-badge status-visible'"
+                  th:text="${order.isHidden ? 'Đã ẩn' : 'Hiển thị'}">
+            </span>
+          </td>
+
+          <!-- THAO TÁC -->
+          <td class="text-center">
+            <form th:action="@{'/admin/orders/' + ${order.orderId} + '/hide'}" method="post" class="d-inline">
+              <button type="submit" class="btn btn-warning btn-sm" title="Ẩn đơn">
+                <i class="bi bi-eye-slash"></i>
+              </button>
+            </form>
+            <form th:action="@{'/admin/orders/' + ${order.orderId} + '/delete'}" method="post" class="d-inline"
+                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');">
+              <button type="submit" class="btn btn-danger btn-sm" title="Xóa đơn">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <small>© 2025 Admin Dashboard. All rights reserved.</small>
+    </footer>
+  </div>
+</div>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('main');
+    sidebar.classList.toggle('collapsed');
+    main.classList.toggle('collapsed');
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

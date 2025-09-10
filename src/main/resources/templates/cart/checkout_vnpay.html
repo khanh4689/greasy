@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/user/payment/vnpay" method="post">
+    <input type="number" name="amount" placeholder="Số tiền" value="690000" required>
+    <select name="bankCode">
+        <option value="NCB">NCB</option>
+        <option value="VNPAYQR">VNPay QR</option>
+    </select>
+    <select name="language">
+        <option value="vn">Tiếng Việt</option>
+        <option value="en">English</option>
+    </select>
+    <button type="submit">Thanh toán</button>
+</form>
+
+</body>
+</html>

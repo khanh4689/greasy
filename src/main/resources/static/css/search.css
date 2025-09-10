@@ -1,0 +1,47 @@
+form.border.bg-light.shadow-sm {
+  background-color: #ffffff !important;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.form-control, .form-select {
+  border-radius: 6px;
+  transition: border-color 0.2s ease-in-out;
+}
+.form-control:focus, .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13,110,253,.15);
+}
+
+.form-check {
+  min-width: 140px;
+}
+
+.card.h-100 {
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card.h-100:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-text.text-danger {
+  font-size: 1.1rem;
+}
+
+.pagination .page-link {
+  color: #0d6efd;
+  border-radius: 6px;
+}
+.pagination .page-item

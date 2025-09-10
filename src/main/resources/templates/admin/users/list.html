@@ -1,0 +1,77 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+  <div class="container mt-3">
+    <h2><i class="bi bi-people-fill me-2"></i>User Management</h2>
+
+    <a th:href="@{/admin/users/add}" class="btn btn-primary mb-3">
+      <i class="bi bi-person-plus me-1"></i> Add New User
+    </a>
+
+    <form th:action="@{/admin/users/list}" method="get" class="mb-3">
+      <div class="input-group">
+        <input type="text" name="search" class="form-control" placeholder="Search by name or email" th:value="${search}">
+        <button type="submit" class="btn btn-secondary">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </form>
+
+    <table class="table table-bordered">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th><i class="bi bi-person"></i> Name</th>
+        <th><i class="bi bi-envelope"></i> Email</th>
+        <th><i class="bi bi-telephone"></i> Phone</th>
+        <th><i class="bi bi-shield-lock"></i> Role</th>
+        <th><i class="bi bi-toggle-on"></i> Status</th>
+        <th><i class="bi bi-gear"></i> Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.phone}"></td>
+        <td th:text="${user.role}"></td>
+        <td th:text="${user.status}"></td>
+        <td>
+          <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="btn btn-sm btn-warning">
+            <i class="bi bi-pencil"></i>
+          </a>
+
+          <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger">
+              <i class="bi bi-trash"></i>
+            </button>
+          </form>
+
+          <form th:action="@{/admin/users/toggle/{id}(id=${user.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-info">
+              <i class="bi" th:classappend="${user.status == 'Active'} ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+          <a class="page-link" th:href="@{/admin/users/list(page=${currentPage - 1}, search=${search})}">
+            <i class="bi bi-chevron-left"></i>
+          </a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active'">
+          <a class="page-link" th:href="@{/admin/users/list(page=${i}, search=${search})}" th:text="${i + 1}"></a>
+        </li>
+        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+          <a class="page-link" th:href="@{/admin/users/list(page=${currentPage + 1}, search=${search})}">
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

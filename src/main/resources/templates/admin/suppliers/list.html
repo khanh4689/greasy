@@ -1,0 +1,96 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<!-- Main content -->
+<main class="main-content">
+  <h1 class="mb-4 fw-bold"><i class="bi bi-truck me-2"></i>Quản lý nhà cung cấp</h1>
+
+  <!-- Notifications -->
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+
+  <!-- Search and Add -->
+  <form th:action="@{/admin/suppliers}" method="get"
+        class="d-flex flex-wrap gap-3 align-items-center bg-white shadow-sm rounded-4 p-3 mb-4">
+    <div class="position-relative flex-grow-1">
+      <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+      <input type="text" name="name" class="form-control ps-5"
+             placeholder="Tìm theo tên nhà cung cấp" th:value="${name}">
+    </div>
+    <button type="submit" class="btn btn-outline-secondary d-flex align-items-center icon-btn" title="Tìm kiếm">
+      <i class="bi bi-search"></i>
+    </button>
+    <a th:href="@{/admin/suppliers/add}" class="btn btn-primary d-flex align-items-center icon-btn" title="Thêm nhà cung cấp">
+      <i class="bi bi-plus-circle"></i>
+    </a>
+  </form>
+
+  <!-- Supplier Table -->
+  <div class="table-responsive bg-white shadow-sm rounded-4 p-3">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light text-center">
+      <tr>
+        <th>ID</th>
+        <th>Tên</th>
+        <th>Email</th>
+        <th>Điện thoại</th>
+        <th>Địa chỉ</th>
+        <th>Ngày tạo</th>
+        <th>Ngày cập nhật</th>
+        <th>Hành động</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="supplier : ${suppliersPage.content}">
+        <td th:text="${supplier.supplierId}"></td>
+        <td th:text="${supplier.name}"></td>
+        <td th:text="${supplier.contactEmail}"></td>
+        <td th:text="${supplier.contactPhone}"></td>
+        <td th:text="${supplier.address}"></td>
+        <td th:text="${#temporals.format(supplier.createdAt, 'dd/MM/yyyy')}"></td>
+        <td th:text="${#temporals.format(supplier.updatedAt, 'dd/MM/yyyy')}"></td>
+        <td class="text-center">
+          <div class="d-flex flex-wrap gap-2 justify-content-center">
+            <a th:href="@{/admin/suppliers/edit/{id}(id=${supplier.supplierId})}" class="btn btn-outline-warning btn-sm icon-btn" title="Sửa">
+              <i class="bi bi-pencil-square"></i>
+            </a>
+            <a th:href="@{/admin/suppliers/delete/{id}(id=${supplier.supplierId})}"
+               class="btn btn-outline-danger btn-sm icon-btn"
+               onclick="return confirm('Bạn có chắc muốn xóa?')" title="Xóa">
+              <i class="bi bi-trash"></i>
+            </a>
+            <a th:href="@{/toggle-hidden/{id}(id=${supplier.supplierId})}"
+               class="btn btn-outline-secondary btn-sm icon-btn"
+               th:title="${supplier.hidden} ? 'Hiện nhà cung cấp' : 'Ẩn nhà cung cấp'">
+              <i class="bi" th:classappend="${supplier.hidden} ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr th:if="${suppliersPage.content.empty}">
+        <td colspan="8" class="text-center text-muted">Không tìm thấy nhà cung cấp nào.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-center mt-4" th:if="${suppliersPage.totalPages > 1}">
+    <nav>
+      <ul class="pagination mb-0">
+        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+          <a class="page-link" th:href="@{/admin/suppliers(page=${currentPage - 1}, name=${name})}">Trước</a>
+        </li>
+        <li th:each="i : ${#numbers.sequence(1, suppliersPage.totalPages)}"
+            class="page-item" th:classappend="${i == currentPage} ? 'active'">
+          <a class="page-link" th:href="@{/admin/suppliers(page=${i}, name=${name})}" th:text="${i}"></a>
+        </li>
+        <li class="page-item" th:classappend="${currentPage == suppliersPage.totalPages} ? 'disabled'">
+          <a class="page-link" th:href="@{/admin/suppliers(page=${currentPage + 1}, name=${name})}">Sau</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+
+</main>
+</div>

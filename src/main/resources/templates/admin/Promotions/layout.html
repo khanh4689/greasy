@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Gearsy</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+<!-- Navigation Bar -->
+<nav class="bg-blue-600 text-white p-4">
+  <div class="container mx-auto flex justify-between">
+    <div>
+      <a href="#" class="text-white font-bold text-xl">Gearsy Admin</a>
+    </div>
+    <div>
+      <a th:href="@{/admin/products/list}" class="mr-4 hover:text-gray-300">Danh sách sản phẩm</a>
+      <a th:href="@{/admin/products/add}" class="mr-4 hover:text-gray-300">Thêm sản phẩm</a>
+      <a th:href="@{/admin/Promotions/list}" class="mr-4 hover:text-gray-300">Quản lý khuyến mãi</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container mx-auto p-4">
+  <div th:replace="${contentTemplate}"></div>
+</div>
+</body>
+</html>

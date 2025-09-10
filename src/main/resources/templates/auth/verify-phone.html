@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/user/phone/verify}" method="post" class="card p-4 shadow rounded-4">
+    <div class="mb-3">
+        <label for="phone" class="form-label">Số điện thoại</label>
+        <input type="text" class="form-control" id="phone" name="phone" th:value="${phone}" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label for="otp" class="form-label">Mã OTP</label>
+        <input type="text" class="form-control" id="otp" name="otp" required />
+    </div>
+
+    <button type="submit" class="btn btn-success px-4">Xác minh</button>
+</form>
+
+</body>
+</html>

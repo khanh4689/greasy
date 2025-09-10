@@ -1,0 +1,282 @@
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: #ffffff !important;
+    color: #1e1e1e;
+    scroll-behavior: smooth;
+}
+
+/* Tiêu đề phần */
+.section-title {
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: #b1002f;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.section-title::after {
+    content: "";
+    display: block;
+    width: 70px;
+    height: 4px;
+    background: linear-gradient(to right, #b1002f, #f9d342);
+    margin: 10px auto 0;
+    border-radius: 6px;
+}
+
+/* Danh mục khuyến mãi */
+.promo-category-card {
+    background: linear-gradient(to bottom right, #b1002f, #6f1d1b);
+    color: #fff;
+    transition: all 0.4s ease-in-out;
+    border: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.promo-category-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.promo-img-category {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 4px solid #f9d342;
+    transition: transform 0.4s ease;
+}
+
+.promo-img-category:hover {
+    transform: rotate(3deg) scale(1.1);
+}
+
+.discount-badge {
+    background-color: #f9d342 !important;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    animation: pulse 1.5s infinite;
+}
+
+/* Sản phẩm */
+.product-card {
+    border: none;
+    transition: all 0.4s ease;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+}
+
+.product-img {
+    height: 240px;
+    object-fit: cover;
+    transition: transform 0.35s ease-in-out;
+    width: 100%;
+}
+
+.product-img:hover {
+    transform: scale(1.08);
+}
+
+/* Giá & Tên */
+.product-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #6f1d1b; /* Đổi màu để nổi bật hơn */
+    transition: color 0.3s ease;
+}
+
+.product-name:hover {
+    color: #b1002f;
+}
+
+.original-price {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    color: #888;
+    text-decoration: line-through;
+}
+
+.discounted-price {
+    color: #b1002f;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.current-price {
+    color: #1e1e1e;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* Nút */
+.add-to-cart-btn,
+.btn-outline-primary,
+.btn-outline-danger {
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+.add-to-cart-btn {
+    background: linear-gradient(135deg, #f9d342, #f3c623);
+    color: #1e1e1e;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.add-to-cart-btn:hover {
+    background: linear-gradient(135deg, #f3c623, #ddb300);
+    color: #000;
+    transform: scale(1.05);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-danger:hover {
+    transform: scale(1.1);
+}
+
+/* Input số lượng */
+.quantity-input {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 4px 8px;
+    text-align: center;
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: #0d6efd; /* màu xanh dương Bootstrap */
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.pagination .page-link:hover {
+    background-color: #0d6efd;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    font-weight: 700;
+}
+
+/* Nếu muốn thay đổi số màu từng trang một cách tuỳ chọn, bạn có thể dùng thêm lớp: */
+.page-item.custom-blue .page-link {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+}
+
+/* 🔁 Pulse animation (sử dụng cho badge) */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.85; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.divider-line {
+    height: 4px;
+    border: none;
+    background: linear-gradient(to right, #0d6efd, #b3d4fc);
+    border-radius: 8px;
+    margin: 3rem auto;
+    width: 60%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease-in-out;
+}
+
+.divider-line:hover {
+    width: 70%;
+    background: linear-gradient(to right, #0a58ca, #91c4fc);
+}
+
+/* Layout: List view */
+.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* khoảng cách giữa các sản phẩm */
+    width: 100%;
+}
+
+.list-view .col {
+    width: 100%;
+    max-width: 100%;
+}
+
+.list-view .product-card {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 1rem;
+    gap: 1rem;
+    width: 100%;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.list-view .product-img-wrapper {
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.list-view .product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.list-view .product-img-wrapper:hover .product-img {
+    transform: scale(1.05);
+}
+
+.list-view .card-body {
+    flex: 1;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.list-view .product-title {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+}
+
+.list-view .product-price {
+    color: #e53935;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.list-view .product-old-price {
+    text-decoration: line-through;
+    color: g
+
+
+

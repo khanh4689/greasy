@@ -1,0 +1,84 @@
+/* Nâng cấp giao diện số lượng */
+.quantity-control {
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.quantity-control .btn {
+  background-color: #f8f9fa;
+  border: none;
+  padding: 0.25rem 0.5rem; /* Giảm padding để nhỏ hơn */
+}
+
+.quantity-control .btn:hover {
+  background-color: #e9ecef;
+}
+
+.quantity-control .form-control {
+  border: none;
+  box-shadow: none;
+  height: 30px;
+  width: 40px; /* Giảm chiều rộng để nhỏ gọn hơn */
+  padding: 0.25rem; /* Giảm padding bên trong */
+  text-align: center;
+  -webkit-appearance: none; /* Loại bỏ spinner trên Chrome */
+  -moz-appearance: textfield; /* Loại bỏ spinner trên Firefox */
+}
+
+/* Nút Xóa và Thanh toán */
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  padding: 0.375rem 1rem;
+  font-weight: 600;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #c82333;
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+}
+
+/* Tùy chỉnh form thanh toán */
+.form-check-label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-check-input:checked + .form-check-label {
+  color: #0d6efd;
+}
+
+/* Bảng sản phẩm */
+.table {
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table thead {
+  background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e9ecef;
+  transition: background-color 0.3s ease;
+}

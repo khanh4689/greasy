@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="#{register.title}">Tạo Tài Khoản</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+  <!-- Custom CSS -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .auth-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: row;
+    }
+
+    .auth-image-section {
+      flex: 1;
+      background-color: #f0f0f0;
+    }
+
+    .auth-image-section img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
+    }
+
+    .auth-form-section {
+      flex: 1;
+      padding: 40px 30px;
+    }
+
+    .auth-form-section h2 {
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    .btn-google,
+    .btn-facebook {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .btn-google {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      color: #444;
+    }
+
+    .btn-facebook {
+      background-color: #3b5998;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-google img,
+    .btn-facebook img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .auth-links a {
+      color: #0d6efd;
+    }
+
+    .language-switcher a {
+      color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+      .auth-container {
+        flex-direction: column;
+        border-radius: 0;
+      }
+
+      .auth-image-section img {
+        border-radius: 0;
+        height: 200px;
+      }
+
+      .auth-form-section {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-container">
+  <!-- Left: Image -->
+  <div class="auth-image-section">
+    <img th:src="@{/images/login-im.jpg}" alt="Register Illustration">
+  </div>
+
+  <!-- Right: Form -->
+  <div class="auth-form-section">
+    <h2 th:text="#{register.title}">Tạo Tài Khoản</h2>
+
+    <form th:action="@{/auth/register}" th:object="${registerRequest}" method="post" class="needs-validation" novalidate>
+
+      <!-- Họ và tên -->
+      <div class="mb-3">
+        <label for="name" class="form-label" th:text="#{register.name.label}">Họ và tên</label>
+        <input type="text" id="name" th:field="*{name}" class="form-control" th:placeholder="#{register.name.placeholder}" required>
+        <!-- Thông báo lỗi -->
+        <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label for="email" class="form-label" th:text="#{register.email.label}">Email</label>
+        <input type="email" id="email" th:field="*{email}" class="form-control" th:placeholder="#{register.email.placeholder}" required>
+        <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+      </div>
+
+      <!-- Mật khẩu -->
+      <div class="mb-3">
+        <label for="password" class="form-label" th:text="#{register.password.label}">Mật khẩu</label>
+        <input type="password" id="password" th:field="*{password}" class="form-control" th:placeholder="#{register.password.placeholder}" required>
+        <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+      </div>
+
+      <!-- Nhập lại mật khẩu -->
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label" th:text="#{register.confirm.label}">Nhập lại mật khẩu</label>
+        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control" th:placeholder="#{register.confirm.placeholder}" required>
+        <div class="text-danger" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+      </div>
+
+      <!-- Submit -->
+      <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary" th:text="#{register.button}">Tạo tài khoản</button>
+      </div>
+    </form>
+
+    <div class="auth-links mt-3 text-center">
+      <p>
+        <span th:text="#{register.alreadyHaveAccount}">Đã có tài khoản?</span>
+        <a th:href="@{/auth/login}" th:text="#{register.loginLink}">Đăng nhập</a>
+      </p>
+    </div>
+
+    <div class="auth-social-login mt-4 text-center">
+      <div class="divider">~ Hoặc ~</div>
+
+      <div class="social-login-buttons">
+        <a href="/oauth2/authorization/google" class="btn btn-social btn-google">
+          <img th:src="@{/images/google-icon.png}" alt="Google Icon">
+          Đăng nhập bằng Google
+        </a>
+      </div>
+      <div class="language-switcher text-center mt-4">
+        <a th:href="@{/auth/register(lang='en')}" class="text-decoration-none">English</a> |
+        <a th:href="@{/auth/register(lang='vi')}" class="text-decoration-none">Tiếng Việt</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

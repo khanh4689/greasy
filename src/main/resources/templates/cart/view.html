@@ -1,0 +1,282 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+  <div class="container my-4">
+    <!-- 🛒 Tiêu đề -->
+    <h2 class="mb-4 text-primary">
+      <i class="bi bi-cart-check me-2"></i> Giỏ hàng của bạn
+    </h2>
+
+    <div th:if="${param.paid}" class="alert alert-success d-flex align-items-center">
+      <i class="bi bi-check-circle-fill me-2"></i> Thanh toán thành công! Đơn hàng của bạn đang được xử lý.
+    </div>
+    <div th:if="${param.fail}" class="alert alert-danger d-flex align-items-center">
+      <i class="bi bi-x-circle-fill me-2"></i> Thanh toán thất bại! Vui lòng thử lại hoặc chọn phương thức khác.
+    </div>
+
+    <!-- 🧺 Giỏ hàng trống -->
+    <div th:if="${#lists.isEmpty(items)}" class="alert alert-info d-flex align-items-center">
+      <i class="bi bi-info-circle-fill me-2"></i> Giỏ hàng của bạn đang trống.
+    </div>
+
+    <!-- 📦 Danh sách sản phẩm trong giỏ -->
+    <div th:if="${!#lists.isEmpty(items)}">
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+          <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+            <th>Xoá</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="item, iter : ${items}">
+            <td th:text="${iter.count}">1</td>
+            <td class="fw-semibold text-start ps-3" th:text="${item.product.name}">Tên SP</td>
+            <td>
+              <form th:action="@{/user/cart/update}" method="post" class="d-flex justify-content-center align-items-center">
+                <input type="hidden" name="cartItemId" th:value="${item.cartItemId}" />
+
+                <div class="input-group" style="max-width: 120px;">
+                  <button class="btn btn-outline-secondary btn-sm" type="button" onclick="changeQuantity(this, -1)">-</button>
+                  <input type="number"
+                         name="quantity"
+                         min="1"
+                         th:attr="max=${item.product.stock}"
+                         required
+                         class="form-control text-center"
+                         th:value="${item.quantity}" />
+
+                  <button class="btn btn-outline-secondary btn-sm" type="button" onclick="changeQuantity(this, 1)">+</button>
+                </div>
+              </form>
+            </td>
+            <td th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 3, 'POINT') + ' đ'}"></td>
+            <td th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 3, 'POINT') + ' đ'}"></td>
+
+            <td>
+              <form th:action="@{/user/cart/remove}" method="post">
+                <input type="hidden" name="cartItemId" th:value="${item.cartItemId}" />
+                <button class="btn btn-sm btn-danger" title="Xoá sản phẩm" type="submit">
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- 🎟 Mã khuyến mãi -->
+      <div class="mt-4">
+        <h5><i class="bi bi-ticket-perforated me-2 text-warning"></i> Mã khuyến mãi</h5>
+        <select name="couponId" id="couponId" class="form-select">
+          <option value="">-- Chọn mã khuyến mãi --</option>
+          <option th:each="uc : ${coupons}"
+                  th:value="${uc.userCouponId}"
+                  th:data-discount="${uc.coupon.discountPercent}"
+                  th:text="${uc.coupon.code + ' - Giảm ' + uc.coupon.discountPercent + '%'}">
+          </option>
+        </select>
+      </div>
+
+      <!-- 💵 Tổng tiền -->
+      <div class="text-end mt-4">
+        <h5 class="text-primary fw-bold">
+          <i class="bi bi-cash-coin me-1"></i> Tổng tiền:
+          <span id="totalPrice"
+                th:attr="data-total=${total}"
+                th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 3, 'COMMA') + ' đ'}">
+          </span>
+        </h5>
+      </div>
+
+      <!-- 🧾 Form thanh toán -->
+      <form th:action="@{/user/checkout}" method="post" id="checkoutForm"
+            class="mt-4 border p-4 rounded-4 shadow-sm bg-light">
+        <h4 class="mb-3"><i class="bi bi-truck me-2 text-success"></i>Thông tin giao hàng</h4>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label for="province" class="form-label">Tỉnh/Thành phố</label>
+            <select id="province" class="form-select" required></select>
+          </div>
+          <div class="col-md-4">
+            <label for="district" class="form-label">Quận/Huyện</label>
+            <select id="district" class="form-select" required></select>
+          </div>
+          <div class="col-md-4">
+            <label for="ward" class="form-label">Phường/Xã</label>
+            <select id="ward" name="ward" class="form-select" required></select>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label for="addressDetail" class="form-label">Địa chỉ cụ thể (số nhà, đường...)</label>
+          <input type="text" id="addressDetail" class="form-control" placeholder="123 Lê Lợi..." required />
+          <input type="hidden" id="shippingAddress" name="shippingAddress" />
+        </div>
+
+        <div class="mt-4">
+          <h5><i class="bi bi-credit-card me-2 text-secondary"></i>Phương thức thanh toán</h5>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="paymentMethod" value="COD" id="cod" checked>
+            <label class="form-check-label" for="cod">Thanh toán khi nhận hàng (COD)</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="paymentMethod" value="VNPAY" id="vnpay">
+            <label class="form-check-label" for="vnpay">Thanh toán VNPAY</label>
+          </div>
+        </div>
+        <input type="hidden" id="finalTotal" name="finalTotal" th:value="${total}" />
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-success btn-lg px-4">
+            <i class="bi bi-credit-card-2-front me-2"></i>Thanh toán
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ✅ Script: Load địa chỉ + Gộp địa chỉ -->
+  <script>
+    const provinceSelect = document.getElementById("province");
+    const districtSelect = document.getElementById("district");
+    const wardSelect = document.getElementById("ward");
+    const addressDetailInput = document.getElementById("addressDetail");
+    const shippingAddressInput = document.getElementById("shippingAddress");
+
+    // Load tỉnh
+    fetch("https://provinces.open-api.vn/api/?depth=1")
+      .then(res => res.json())
+      .then(data => {
+        provinceSelect.innerHTML = "<option value=''>-- Chọn Tỉnh/Thành phố --</option>";
+        data.forEach(province => {
+          const opt = document.createElement("option");
+          opt.value = province.code;
+          opt.textContent = province.name;
+          provinceSelect.appendChild(opt);
+        });
+      });
+
+    // Load quận
+    provinceSelect.addEventListener("change", () => {
+      const provinceCode = provinceSelect.value;
+      districtSelect.innerHTML = "<option value=''>-- Chọn Quận/Huyện --</option>";
+      wardSelect.innerHTML = "<option value=''>-- Chọn Phường/Xã --</option>";
+
+      fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+        .then(res => res.json())
+        .then(data => {
+          data.districts.forEach(district => {
+            const opt = document.createElement("option");
+            opt.value = district.code;
+            opt.textContent = district.name;
+            districtSelect.appendChild(opt);
+          });
+        });
+    });
+
+    // Load xã
+    districtSelect.addEventListener("change", () => {
+      const districtCode = districtSelect.value;
+      wardSelect.innerHTML = "<option value=''>-- Chọn Phường/Xã --</option>";
+
+      fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+        .then(res => res.json())
+        .then(data => {
+          data.wards.forEach(ward => {
+            const opt = document.createElement("option");
+            opt.value = ward.name;
+            opt.textContent = ward.name;
+            wardSelect.appendChild(opt);
+          });
+        });
+    });
+
+    // Gộp địa chỉ
+    document.getElementById("checkoutForm").addEventListener("submit", function (e) {
+      if (!provinceSelect.value || !districtSelect.value || !wardSelect.value || !addressDetailInput.value.trim()) {
+        alert("Vui lòng nhập đầy đủ thông tin địa chỉ giao hàng.");
+        e.preventDefault();
+        return;
+      }
+
+      const provinceText = provinceSelect.options[provinceSelect.selectedIndex].text;
+      const districtText = districtSelect.options[districtSelect.selectedIndex].text;
+      const wardText = wardSelect.options[wardSelect.selectedIndex].text;
+      const detail = addressDetailInput.value.trim();
+
+      shippingAddressInput.value = `${detail}, ${wardText}, ${districtText}, ${provinceText}`;
+    });
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("input[name='quantity']").forEach(input => {
+    const max = parseInt(input.getAttribute("max"));
+
+    // Khi người dùng nhập trực tiếp
+    input.addEventListener("input", function () {
+      let value = parseInt(this.value);
+
+      if (!value || value < 1) {
+        this.value = 1;
+      } else if (max && value > max) {
+        this.value = max;
+        alert("Bạn đã đạt số lượng tồn kho tối đa cho sản phẩm này!");
+      }
+
+      // Submit sau khi nhập
+      const form = this.closest("form");
+      setTimeout(() => form.submit(), 500);
+    });
+  });
+});
+
+function changeQuantity(button, delta) {
+  const input = button.parentElement.querySelector("input[name='quantity']");
+  const max = parseInt(input.getAttribute("max")); // đây chính là stock trong DB
+  let current = parseInt(input.value) || 1;
+
+  current += delta;
+  if (current < 1) current = 1;
+  if (max && current > max) {
+    current = max;
+    alert("Bạn đã đạt số lượng tồn kho tối đa cho sản phẩm này!");
+  }
+
+  input.value = current;
+
+  // Submit form sau 300ms
+  setTimeout(() => {
+    const form = button.closest("form");
+    form.submit();
+  }, 300);
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+      // 🎟 Giảm giá
+      const couponSelect = document.getElementById("couponId");
+      const totalPriceEl = document.getElementById("totalPrice");
+      const finalTotalInput = document.getElementById("finalTotal");
+
+      const originalTotal = parseFloat(totalPriceEl.dataset.total);
+
+      couponSelect.addEventListener("change", function () {
+        const selectedOption = couponSelect.options[couponSelect.selectedIndex];
+        const discountPercent = selectedOption.getAttribute("data-discount");
+
+        let finalTotal = originalTotal;
+        if (discountPercent) {
+          finalTotal = originalTotal * (1 - discountPercent / 100);
+        }
+
+        // Cập nhật giao diện + hidden input
+        totalPriceEl.textContent = finalTotal.toLocaleString("vi-VN") + " đ";
+        finalTotalInput.value = finalTotal.toFixed(0);
+      });
+    });
+  </script>
+  </script>
+</div>

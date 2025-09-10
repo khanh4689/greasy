@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.min.css">
+
+</head>
+<body>
+<header th:fragment="header">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light py-3 shadow-sm">
+    <div class="container d-flex align-items-center justify-content-between">
+
+      <a class="navbar-brand fw-bold text-primary me-4" href="/products/list" style="font-size: 1.5rem;">
+        GEARSY
+      </a>
+
+      <!-- Search & Category (flex-grow = fill space) -->
+      <div class="flex-grow-1 mx-3">
+        <form class="d-flex align-items-center" th:action="@{/products/search}" method="get">
+          <div class="input-group search-bar-custom">
+            <input type="search" class="form-control" name="keyword" th:attr="placeholder=#{header.search.placeholder}"  placeholder="Tìm kiếm..." required>
+
+            <label class="input-group-text custom-category-select-wrapper" for="categorySelect">
+              <select class="form-select border-0 shadow-none"
+                      id="categorySelect"
+                      name="categoryId"
+                      aria-label="Chọn danh mục"
+                      onchange="if (this.value) window.location.href='/products/category/' + this.value;">
+                <option value="" selected>Danh mục</option>
+                <option th:each="category : ${categories}"
+                        th:value="${category.categoryId}"
+                        th:text="${category.name}">
+                </option>
+              </select>
+            </label>
+
+            <button class="btn btn-primary" type="submit"> <i class="bi bi-search"></i></button> </div>
+        </form>
+      </div>
+
+
+      <!-- Icons + Nút Settings -->
+      <div class="d-flex align-items-center ms-3">
+
+        <!-- Nếu user đã login thì hiện dropdown -->
+        <div class="dropdown me-2" th:if="${#authorization.expression('isAuthenticated()')}">
+          <a href="#"
+             class="btn btn-link text-dark dropdown-toggle"
+             id="accountDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            <i class="bi bi-person-circle fs-4"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+            <li>
+              <a class="dropdown-item" href="/user/profile">Thông tin tài khoản</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/auth/logout">Đăng xuất</a>
+            </li>
+            <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+              <a class="dropdown-item" href="/admin/dashboard">Trang admin</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Nếu user chưa login thì hiện Đăng nhập + Đăng ký -->
+        <div class="me-2" th:if="${!#authorization.expression('isAuthenticated()')}">
+          <a href="/auth/login" class="btn btn-outline-primary me-2">Đăng nhập</a>
+          <a href="/auth/register" class="btn btn-primary">Đăng ký</a>
+        </div>
+      </div>
+
+
+      <!-- Yêu thích -->
+        <a th:href="${#authorization.expression('isAuthenticated()') ? '/favorites' : '/auth/login'}"
+           class="btn btn-link text-dark me-2"
+           title="Yêu thích">
+          <i class="bi bi-heart fs-4"></i>
+        </a>
+
+        <!-- Giỏ hàng -->
+      <a th:href="${#authorization.expression('isAuthenticated()') ? '/user/cart' : '/auth/login'}"
+         class="btn btn-link text-dark me-2 position-relative"
+         title="Giỏ hàng">
+        <i class="bi bi-cart fs-4"></i>
+        <span th:if="${cartCount > 0}"
+              th:text="${cartCount}"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+  </span>
+      </a>
+
+      </div>
+
+
+      <!-- Nút 3 gạch settings -->
+        <div class="dropdown">
+          <button class="btn btn-link text-dark dropdown-toggle p-0 me-0" type="button" id="settingsDropdown" data-bs-toggle="dropdown" th:attr="title=#{header.settings.title}" title="Cài đặt" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical fs-4"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="settingsDropdown" style="min-width: 220px;">
+            <li class="mb-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span th:text="#{header.display.mode}">Chế độ hiển thị</span>
+                <div class="btn-group btn-group-sm ms-2" role="group">
+                  <button id="gridBtn" class="btn btn-outline-primary active toggle-layout-btn" data-target="#productContainer" data-layout="grid">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                  </button>
+                  <button id="listBtn" class="btn btn-outline-primary toggle-layout-btn" data-target="#productContainer" data-layout="list">
+                    <i class="bi bi-list-ul"></i>
+                  </button>
+                </div>
+              </div>
+            </li>
+            <li class="mb-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span th:text="#{settings.language}">Ngôn ngữ</span>
+                <div class="btn-group btn-group-sm ms-2" role="group">
+                  <a th:href="@{/products/list(lang='vi')}" class="btn btn-outline-primary" th:classappend="${#locale.language == 'vi'} ? 'active'" th:text="#{settings.language.vietnamese}">Tiếng Việt</a>
+                  <a th:href="@{/products/list(lang='en')}" class="btn btn-outline-primary" th:classappend="${#locale.language == 'en'} ? 'active'" th:text="#{settings.language.english}">English</a>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const gridBtn = document.getElementById("gridBtn");
+    const listBtn = document.getElementById("listBtn");
+
+    const containers = [
+      document.getElementById("productContainer"),
+      document.getElementById("newestproductContainer")
+    ];
+
+    function setLayout(layout) {
+      containers.forEach(container => {
+        if (!container) return;
+        if (layout === "list") {
+          container.classList.remove("grid-view");
+          container.classList.add("list-view");
+        } else {
+          container.classList.add("grid-view");
+          container.classList.remove("list-view");
+        }
+      });
+
+      if (layout === "list") {
+        listBtn.classList.add("active");
+        gridBtn.classList.remove("active");
+      } else {
+        gridBtn.classList.add("active");
+        listBtn.classList.remove("active");
+      }
+
+      localStorage.setItem("layout", layout);
+    }
+
+    const savedLayout = localStorage.getItem("layout") || "grid";
+    setLayout(savedLayout);
+
+    gridBtn.addEventListener("click", () => setLayout("grid"));
+    listBtn.addEventListener("click", () => setLayout("list"));
+
+
+    });
+</script>
+
+
+</body>
+</html>

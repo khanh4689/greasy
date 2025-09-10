@@ -1,0 +1,55 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+    <div class="container ck-invoice-container">
+        <div class="invoice-box ck-invoice-box p-4 shadow rounded bg-white mt-5">
+            <!-- Tiêu đề hóa đơn -->
+            <h2 class="mb-4 text-center ck-invoice-title" th:text="#{invoice.title}">HÓA ĐƠN THANH TOÁN</h2>
+
+            <!-- Thông tin hóa đơn -->
+            <div class="ck-invoice-info mb-4">
+                <p><strong th:text="#{order.id}">Mã đơn hàng:</strong> <span th:text="${order.orderId}">#123456</span></p>
+                <p><strong th:text="#{order.date}">Ngày đặt:</strong>
+                    <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/08/2025 15:30</span>
+                </p>
+                <p><strong th:text="#{shipping.address}">Địa chỉ giao hàng:</strong>
+                    <span th:text="${order.shippingAddress}">123 Đường ABC, TP. HCM</span>
+                </p>
+                <p><strong th:text="#{status}">Trạng thái:</strong>
+                    <span th:text="${order.status}">Đang xử lý</span>
+                </p>
+                <p><strong th:text="#{total.amount}">Tổng tiền:</strong>
+                    <span th:text="${#numbers.formatDecimal(total, 0, 'POINT', 3, 'COMMA') + ' đ'}">0 đ</span>
+                </p>
+            </div>
+
+            <!-- Chi tiết sản phẩm -->
+            <h4 class="mb-3 ck-invoice-subtitle" th:text="#{product.details}">Chi tiết sản phẩm</h4>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped ck-invoice-table">
+                    <thead class="table-primary">
+                    <tr>
+                        <th th:text="#{product.name}">Sản phẩm</th>
+                        <th th:text="#{quantity}">Số lượng</th>
+                        <th th:text="#{unit.price}">Đơn giá</th>
+                        <th th:text="#{total.price}">Thành tiền</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${orderDetails}">
+                        <td th:text="${item.product.name}">Tên sản phẩm</td>
+                        <td th:text="${item.quantity}">1</td>
+                        <td th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 3, 'COMMA') + ' đ'}">100.000 đ</td>
+                        <td th:text="${#numbers.formatDecimal(item.quantity * item.unitPrice, 0, 'POINT', 3, 'COMMA') + ' đ'}">100.000 đ</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Nút chức năng -->
+            <div class="text-center mt-4 ck-invoice-buttons">
+                <a th:href="@{/user/invoice/pdf/{id}(id=${order.orderId})}" class="btn btn-danger me-2" th:text="#{btn.export.pdf}">Xuất file PDF</a>
+                <a th:href="@{/products/list}" class="btn btn-outline-primary" th:text="#{btn.back.home}">Quay về trang chủ</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,290 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+    <div class="container my-4">
+        <div class="owl-carousel owl-theme" id="bannerSlider">
+            <div class="item" th:each="b : ${banners}"
+                 th:data-id="${b.product.productId}"
+                 th:data-name="${b.product.name}"
+                 th:data-img="@{${b.imageUrl}}">
+
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                    <img th:src="@{/images/{img}(img=${b.imageUrl})}"
+                         th:alt="${b.title}"
+                         class="card-img-top img-fluid">
+                    <div class="card-body text-center bg-light">
+                        <h5 class="card-title fw-bold text-primary" th:text="${b.title}"></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="section-title text-center mb-4">
+                    <i class="bi bi-fire me-2 animated-fire"></i>
+                    <span th:text="#{section.promotion.title}">Danh mục khuyến mãi hôm nay</span>
+                </h2>
+
+                <div th:if="${#lists.isEmpty(discountedCategories)}" class="text-center">
+                    <p class="text-muted fs-5" th:text="#{no.promotion.message}">Hiện không có danh mục nào đang được khuyến mãi. Hãy ghé lại sau nhé!</p>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(discountedCategories)}" class="d-flex flex-wrap justify-content-center gap-4">
+                    <div th:each="dc : ${discountedCategories}"
+                         class="promo-category-card border-0 rounded-4 shadow-lg position-relative overflow-hidden p-3 d-flex flex-column align-items-center justify-content-between text-center"
+                         style="width: 200px; height: 260px; background-image: linear-gradient(to bottom right, #ff4d4d, #c0392b);">
+                        <div class="discount-badge bg-warning text-dark fw-bold position-absolute top-0 end-0 px-3 py-1 rounded-pill m-2">
+                            <span th:text="#{discount.label}">Giảm</span> <span th:text="${dc.maxDiscountToday + '%'}">20%</span>
+                        </div>
+
+                        <a th:href="@{/products/category/{id}(id=${dc.categoryId})}" class="promo-img-category-wrapper mb-2 mt-4">
+                            <img th:if="${dc.images != null}"
+                                 th:src="@{/images/{img}(img=${dc.images})}"
+                                 alt="Category Image"
+                                 class="rounded-circle border border-3 border-white promo-img-category" />
+                            <img th:unless="${dc.images != null}"
+                                 src="/images/default-category.png" alt="Default Category Image"
+                                 class="rounded-circle border border-3 border-white promo-img-category" />
+                        </a>
+
+                        <h5 class="fw-bolder text-white mb-2 category-name" th:text="${dc.categoryName}">Danh mục</h5>
+
+                        <span class="countdown-timer badge bg-light text-danger fw-bold px-3 py-2 rounded-pill small"
+                              th:attr="data-end-date=${dc.endDateAsString}">
+                            <i class="bi bi-clock me-1"></i>
+                            <span th:text="#{countdown.remaining}">Còn lại...</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-5 divider-line"/>
+        <div class="mb-5 featured-products-section">
+            <h2 class="section-title text-center mb-4">
+                <i class="bi bi-star-fill me-2 animated-star"></i>
+                <span th:text="#{section.featured.title}">Sản phẩm nổi bật</span>
+            </h2>
+
+            <div id="productContainer" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4 product-grid grid-view">
+                <div class="col" th:each="product : ${featuredProducts}">
+                    <div class="card product-card h-100 shadow-sm border-0 rounded-4 p-2 text-center">
+                        <a th:href="@{/products/detail/{id}(id=${product.id})}" class="product-img-wrapper d-block">
+                            <img th:if="${product.image != null}"
+                                 th:src="@{/images/{img}(img=${product.image})}"
+                                 class="card-img-top product-img img-fluid rounded"
+                                 alt="Product Image"/>
+                            <img th:unless="${product.image != null}"
+                                 src="/images/default-product.png"
+                                 class="card-img-top product-img img-fluid rounded"
+                                 alt="Default Product Image"/>
+                        </a>
+                        <div class="card-body px-2 py-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="prices text-start">
+                                    <div th:if="${product.onSale}" class="d-flex align-items-center gap-2">
+                                        <span class="discounted-price fw-bold fs-5 text-danger"
+                                              th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 3, 'POINT') + ' đ'}"></span>
+                                        <span class="original-price text-muted text-decoration-line-through small"
+                                              th:text="${#numbers.formatDecimal(product.originalPrice, 0, 'COMMA', 3, 'POINT') + ' đ'}"></span>
+                                    </div>
+                                    <div th:if="${!product.onSale}">
+                                         <span class="fw-bold fs-5"
+                                        th:text="${#numbers.formatDecimal(product.originalPrice, 0, 'COMMA', 3, 'POINT') + ' đ'}"></span>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-1">
+                                    <form th:action="@{/user/cart/add}" method="post" class="m-0">
+                                        <input type="hidden" th:name="productId" th:value="${product.id}" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <h6 class="product-name fw-bold mt-2 mb-0 text-start" th:text="${product.name}">Tên sản phẩm</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Featured pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:each="page : ${#numbers.sequence(0, featuredTotalPages - 1)}"
+                                th:classappend="${page == featuredCurrentPage} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/products/list(featuredPage=${page}, newestPage=${newestCurrentPage})}"
+                                   th:text="${page + 1}">1</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-5 divider-line"/>
+
+        <div class="mb-5 newest-products-section">
+            <h2 class="section-title text-center mb-4">
+                <i class="bi bi-clock-history me-2 animated-clock"></i>
+                <span th:text="#{section.newest.title}">Sản phẩm mới nhất</span>
+            </h2>
+            <div id="newestproductContainer" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4 product-grid grid-view">
+                <div class="col" th:each="product : ${newestProducts}">
+                    <div class="card h-100 product-card shadow-sm rounded-4 overflow-hidden p-2">
+                        <a th:href="@{/products/detail/{id}(id=${product.id})}" class="product-img-wrapper d-block">
+                            <img th:if="${product.image != null}"
+                                 th:src="@{/images/{img}(img=${product.image})}"
+                                 class="card-img-top product-img img-fluid rounded" alt="Product Image"/>
+                            <img th:unless="${product.image != null}"
+                                 src="/images/default-product.png"
+                                 class="card-img-top product-img img-fluid rounded" alt="Default Product Image"/>
+                        </a>
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="prices text-start">
+                                    <div th:if="${product.onSale}" class="d-flex align-items-center gap-2">
+                                        <span class="discounted-price fw-bold fs-5 text-danger"
+                                              th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'POINT', 3, 'COMMA') + ' đ'}"></span>
+                                        <span class="original-price text-muted text-decoration-line-through small"
+                                              th:text="${#numbers.formatDecimal(product.originalPrice, 0, 'POINT', 3, 'COMMA') + ' đ'}"></span>
+                                    </div>
+                                    <div th:if="${!product.onSale}">
+                                        <span class="fw-bold fs-5"
+                                              th:text="${#numbers.formatDecimal(product.originalPrice, 0, 'POINT', 3, 'COMMA') + ' đ'}"></span>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <form th:action="@{/user/cart/add}" method="post" class="m-0">
+                                        <input type="hidden" th:name="productId" th:value="${product.id}" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <h6 class="product-name fw-bold mb-3 text-start" th:text="${product.name}">Tên sản phẩm</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Newest pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:each="page : ${#numbers.sequence(0, newestTotalPages - 1)}"
+                                th:classappend="${page == newestCurrentPage} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/products/list(featuredPage=${featuredCurrentPage}, newestPage=${page})}"
+                                   th:text="${page + 1}">1</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Countdown Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const countdowns = document.querySelectorAll(".countdown-timer");
+            countdowns.forEach(el => {
+                const endTime = new Date(el.dataset.endDate).getTime();
+
+                const updateCountdown = () => {
+                    const now = new Date().getTime();
+                    const diff = endTime - now;
+
+                    if (diff <= 0) {
+                        el.innerHTML = `<i class="bi bi-clock me-1"></i> <span class="text-danger" th:text="#{countdown.expired}">Đã hết hạn</span>`;
+                        return;
+                    }
+
+                    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                    const seconds = Math.floor((diff / 1000) % 60);
+
+                    el.innerHTML = `<i class="bi bi-clock me-1"></i> <span class="countdown-text" th:text="'#{countdown.remaining} ' + hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')">Còn lại ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</span>`;
+                };
+
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const gridBtn = document.getElementById("gridBtn");
+            const listBtn = document.getElementById("listBtn");
+
+            const containers = [
+                document.getElementById("productContainer"),
+                document.getElementById("newestproductContainer")
+            ];
+
+            function setLayout(layout) {
+                containers.forEach(container => {
+                    if (!container) return;
+                    if (layout === "list") {
+                        container.classList.remove("grid-view");
+                        container.classList.add("list-view");
+                    } else {
+                        container.classList.add("grid-view");
+                        container.classList.remove("list-view");
+                    }
+                });
+
+                if (layout === "list") {
+                    listBtn.classList.add("active");
+                    gridBtn.classList.remove("active");
+                } else {
+                    gridBtn.classList.add("active");
+                    listBtn.classList.remove("active");
+                }
+
+                localStorage.setItem("layout", layout);
+            }
+
+            const savedLayout = localStorage.getItem("layout") || "grid";
+            setLayout(savedLayout);
+
+            gridBtn.addEventListener("click", () => setLayout("grid"));
+            listBtn.addEventListener("click", () => setLayout("list"));
+        });
+
+        $(document).ready(function(){
+  $("#bannerSlider").owlCarousel({
+    items: 1,
+    loop: true,
+    autoplay: true,
+    autoplayTimeout: 4000,
+    dots: true,
+    nav: true
+  });
+
+  $("#bannerSlider .item").on("click", function() {
+    const productId = $(this).data("id");
+    const productName = $(this).data("name");
+    const img = $(this).data("img");
+
+    $("#bannerModalImg").attr("src", img);
+    $("#bannerProductName").text(productName);
+    $("#modalProductId").val(productId);
+    $("#modalProductIdBuy").val(productId);
+
+    $("#bannerModal").modal("show");
+  });
+});
+
+    </script>
+</div>

@@ -1,0 +1,69 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<!-- Main Content -->
+<main class="main-content">
+    <h1 class="mb-4 fw-bold"><i class="bi bi-chat-dots-fill me-2"></i>Quản lý bình luận đánh giá</h1>
+
+    <!-- Search Section -->
+    <form method="get" th:action="@{/admin/reviews}" class="d-flex flex-wrap gap-3 align-items-center bg-white shadow-sm rounded-4 p-3 mb-4">
+        <div class="position-relative flex-grow-1">
+            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            <input type="text" name="keyword" class="form-control ps-5"
+                   placeholder="Tìm theo tên người dùng, sản phẩm, bình luận"
+                   th:value="${keyword}">
+        </div>
+        <button type="submit" class="btn btn-outline-secondary d-flex align-items-center icon-btn" title="Tìm kiếm">
+            <i class="bi bi-search"></i>
+        </button>
+    </form>
+
+    <!-- Table -->
+    <div class="table-responsive bg-white shadow-sm rounded-4 p-3">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-center">
+            <tr>
+                <th>ID</th>
+                <th>Người dùng</th>
+                <th>Sản phẩm</th>
+                <th>Đánh giá</th>
+                <th>Bình luận</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="review : ${reviews}">
+                <td th:text="${review.reviewId}"></td>
+                <td th:text="${review.user.name}"></td>
+                <td th:text="${review.product.name}"></td>
+                <td>
+                    <span class="badge bg-warning text-dark rating-badge" th:text="${review.rating + '/5'}"></span>
+                </td>
+                <td th:text="${review.comment}"></td>
+                <td class="text-center">
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        <form th:action="@{/admin/reviews/hide/{id}(id=${review.reviewId})}" method="post">
+                            <button type="submit" class="btn btn-outline-warning btn-sm icon-btn" title="Ẩn/Hiện bình luận">
+                                <i th:classappend="${review.status == 'HIDDEN'} ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/reviews/delete/{id}(id=${review.reviewId})}" method="post"
+                              onsubmit="return confirm('Bạn có chắc muốn xóa bình luận này?');">
+                            <button type="submit" class="btn btn-outline-danger btn-sm icon-btn" title="Xóa bình luận">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(reviews)}">
+                <td colspan="6" class="text-center text-muted">Không có đánh giá nào.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5">
+        © 2025 Hệ thống quản trị. All rights reserved.
+    </footer>
+</main>
+</div>

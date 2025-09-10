@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Sửa sản phẩm</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e9ecef;
+    }
+    .form-label {
+      font-weight: 600;
+      color: #212529;
+      margin-bottom: 8px;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 2px solid #dee2e6;
+      padding: 12px 16px;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #212529;
+      margin-bottom: 2rem;
+    }
+
+    /* Current Image Display */
+    .current-image-container {
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px;
+      background-color: #f8f9fa;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .current-image-title {
+      font-weight: 600;
+      color: #212529;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    .current-image {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 12px;
+      border: 3px solid #e9ecef;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      object-fit: cover;
+    }
+
+    .no-image-text {
+      color: #6c757d;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    /* Custom Image Upload Styles */
+    .image-upload-container {
+      border: 2px dashed #dee2e6;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      background-color: #f8f9fa;
+      transition: all 0.3s ease;
+      position: relative;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .image-upload-container:hover {
+      border-color: #0d6efd;
+      background-color: #e7f1ff;
+    }
+
+    .image-upload-container.dragover {
+      border-color: #0d6efd;
+      background-color: #e7f1ff;
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 2.5rem;
+      color: #6c757d;
+      margin-bottom: 10px;
+    }
+
+    .upload-text {
+      color: #6c757d;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .upload-subtext {
+      color: #9ca3af;
+      font-size: 0.875rem;
+    }
+
+    .file-input-hidden {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+    }
+
+    .image-preview-container {
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+
+    .image-title {
+      font-weight: 600;
+      color: #212529;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .preview-image {
+      max-width: 250px;
+      max-height: 250px;
+      border-radius: 12px;
+      border: 3px solid #e9ecef;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      object-fit: cover;
+    }
+
+    .image-info {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+
+    .remove-image-btn {
+      margin-top: 10px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .remove-image-btn:hover {
+      background-color: #c82333;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .success-message {
+      color: #155724;
+      font-size: 0.875rem;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .change-image-info {
+      background-color: #e7f1ff;
+      border: 1px solid #b6d7ff;
+      color: #0d47a1;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+<div class="container my-5">
+  <h1><i class="bi bi-pencil-square me-2"></i>Sửa sản phẩm</h1>
+
+  <div th:if="${error}" class="alert alert-danger d-flex align-items-center" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <div th:text="${error}"></div>
+  </div>
+
+  <form th:action="@{/admin/products/edit/{id}(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data" class="form-container">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">
+          <i class="bi bi-tag me-1"></i>Tên sản phẩm
+        </label>
+        <input type="text" th:field="*{name}" class="form-control" required placeholder="Nhập tên sản phẩm">
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">
+          <i class="bi bi-currency-dollar me-1"></i>Giá
+        </label>
+        <input type="number" step="0.01" th:field="*{price}" class="form-control" required placeholder="0.00">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">
+          <i class="bi bi-box me-1"></i>Tồn kho
+        </label>
+        <input type="number" th:field="*{stock}" class="form-control" required placeholder="Số lượng">
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">
+          <i class="bi bi-eye me-1"></i>Trạng thái
+        </label>
+        <select th:field="*{hidden}" class="form-select">
+          <option value="false">Hiển thị</option>
+          <option value="true">Ẩn</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">
+        <i class="bi bi-card-text me-1"></i>Mô tả
+      </label>
+      <textarea th:field="*{description}" id="editor" class="form-control" rows="6"></textarea>
+    </div>
+
+    <!-- Current Image Display -->
+    <div class="mb-4">
+      <label class="form-label">
+        <i class="bi bi-image me-1"></i>Hình ảnh sản phẩm
+      </label>
+
+      <div class="current-image-container">
+        <div class="current-image-title">Ảnh hiện tại:</div>
+        <div th:if="${product.images != null and !#strings.isEmpty(product.images)}">
+          <img th:src="@{|/images/${product.images}|}" class="current-image" alt="Ảnh sản phẩm hiện tại">
+          <div class="mt-2 text-muted small" th:text="${product.images}"></div>
+        </div>
+        <div th:unless="${product.images != null and !#strings.isEmpty(product.images)}" class="no-image-text">
+          <i class="bi bi-image-fill me-2"></i>Chưa có ảnh
+        </div>
+      </div>
+
+      <div class="change-image-info">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Lưu ý:</strong> Chỉ tải ảnh mới nếu bạn muốn thay đổi. Để trống sẽ giữ nguyên ảnh hiện tại.
+      </div>
+
+      <div class="image-upload-container" id="imageUploadContainer">
+        <input type="file" accept="image/*" class="file-input-hidden" id="imageUpload" name="imageFile">
+        <i class="bi bi-cloud-upload upload-icon"></i>
+        <div class="upload-text">Kéo thả ảnh mới vào đây hoặc click để chọn</div>
+        <div class="upload-subtext">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB) - Không bắt buộc</div>
+      </div>
+
+      <div class="image-preview-container" id="imagePreviewContainer">
+        <div class="image-title" id="imageTitle">Ảnh mới sẽ thay thế:</div>
+        <img id="previewImage" class="preview-image" />
+        <div class="image-info" id="imageInfo"></div>
+        <button type="button" class="remove-image-btn" id="removeImageBtn">
+          <i class="bi bi-trash me-1"></i>Hủy thay đổi
+        </button>
+      </div>
+
+      <div id="imageError" class="error-message"></div>
+      <div id="imageSuccess" class="success-message"></div>
+    </div>
+
+    <div class="row">
+      <div class="mb-3">
+        <label class="form-label">
+          <i class="bi bi-card-text me-1"></i>Thông số kỹ thuật
+        </label>
+        <textarea th:field=" *{compatibilitySpecs}" id="editor-com" class="form-control" rows="6"></textarea>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">
+          <i class="bi bi-list-ul me-1"></i>Danh mục
+        </label>
+        <select th:field="*{categoryId}" class="form-select" required>
+          <option value="">Chọn danh mục</option>
+          <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.name}"></option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">
+        <i class="bi bi-building me-1"></i>Nhà cung cấp
+      </label>
+      <select th:field="*{supplierId}" class="form-select" required>
+        <option value="">Chọn nhà cung cấp</option>
+        <option th:each="supplier : ${suppliers}" th:value="${supplier.supplierId}" th:text="${supplier.name}"></option>
+      </select>
+    </div>
+
+    <div class="d-flex gap-3 mt-4">
+      <button type="submit" class="btn btn-success btn-lg px-4">
+        <i class="bi bi-check-lg me-2"></i>Cập nhật sản phẩm
+      </button>
+      <a th:href="@{/admin/products/list}" class="btn btn-outline-secondary btn-lg px-4">
+        <i class="bi bi-arrow-left me-2"></i>Hủy
+      </a>
+    </div>
+  </form>
+</div>
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const imageUpload = document.getElementById('imageUpload');
+    const imageUploadContainer = document.getElementById('imageUploadContainer');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const imageError = document.getElementById('imageError');
+    const imageSuccess = document.getElementById('imageSuccess');
+    const imageTitle = document.getElementById('imageTitle');
+    const imageInfo = document.getElementById('imageInfo');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+
+    function showError(message) {
+      imageError.textContent = message;
+      imageError.style.display = 'block';
+      imageSuccess.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      imageSuccess.textContent = message;
+      imageSuccess.style.display = 'block';
+      imageError.style.display = 'none';
+    }
+
+    function hideMessages() {
+      imageError.style.display = 'none';
+      imageSuccess.style.display = 'none';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function handleFileSelect(file) {
+      if (!file.type.startsWith('image/')) {
+        showError('Vui lòng chọn một file ảnh hợp lệ (JPG, PNG, GIF)');
+        return false;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        showError('Kích thước ảnh không được vượt quá 5MB');
+        return false;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        imageTitle.textContent = `Ảnh mới: ${file.name}`;
+        imageInfo.innerHTML = `
+          <i class="bi bi-info-circle me-1"></i>
+          Kích thước: ${formatFileSize(file.size)} |
+          Loại: ${file.type}
+        `;
+
+        imageUploadContainer.style.display = 'none';
+        imagePreviewContainer.style.display = 'block';
+
+        showSuccess('Ảnh mới đã được chọn! Sẽ thay thế ảnh hiện tại khi lưu.');
+
+        setTimeout(() => {
+          hideMessages();
+        }, 4000);
+      };
+      reader.readAsDataURL(file);
+      return true;
+    }
+
+    function resetImageUpload() {
+      imageUpload.value = '';
+      imageUploadContainer.style.display = 'flex';
+      imagePreviewContainer.style.display = 'none';
+      hideMessages();
+    }
+
+    // File input change event
+    imageUpload.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (!handleFileSelect(file)) {
+          event.target.value = '';
+        }
+      }
+    });
+
+    // Drag and drop events
+    imageUploadContainer.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.add('dragover');
+    });
+
+    imageUploadContainer.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.remove('dragover');
+    });
+
+    imageUploadContainer.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.remove('dragover');
+
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        const file = files[0];
+        if (handleFileSelect(file)) {
+          imageUpload.files = files;
+        }
+      }
+    });
+
+    // Remove image button - resets to current image
+    removeImageBtn.addEventListener('click', function() {
+      resetImageUpload();
+      showSuccess('Đã hủy thay đổi. Sẽ giữ nguyên ảnh hiện tại.');
+      setTimeout(() => {
+        hideMessages();
+      }, 3000);
+    });
+
+    // Form submission - no validation needed for edit as image is optional
+    document.querySelector('form').addEventListener('submit', function(event) {
+      // No validation needed - image is optional in edit mode
+      hideMessages();
+    });
+  });
+
+  ClassicEditor
+    .create(document.querySelector('#editor'))
+    .catch(error => {
+        console.error(error);
+    });
+
+    ClassicEditor
+    .create(document.querySelector('#editor-com'))
+    .catch(error => {=
+        console.error(error);
+    });
+
+</script>
+</body>
+</html>

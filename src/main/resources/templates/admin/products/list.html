@@ -1,0 +1,124 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+    <div class="container py-5">
+        <h1 class="mb-4 fw-bold fs-3">Quản lý sản phẩm</h1>
+        <div class="mb-3 d-flex justify-content-end">
+            <a class="btn btn-danger me-2" th:href="@{/admin/products/export/pdf(keyword=${keyword})}">
+                <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
+            </a>
+            <a class="btn btn-success" th:href="@{/admin/products/export/excel(keyword=${keyword})}">
+                <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+            </a>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${error != null}" class="alert alert-danger" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <form method="get" action="/admin/products/list" class="mb-3">
+                <div class="row g-2">
+                    <div class="col-12 col-sm-9 col-md-6">
+                        <input type="text" name="keyword" class="form-control"
+                               placeholder="Tìm theo tên sản phẩm..." th:value="${keyword}">
+                    </div>
+                    <div class="col-12 col-sm-3 col-md-2">
+                        <button type="submit" class="btn btn-primary w-100" title="Tìm kiếm">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div>
+                <a th:href="@{/admin/products/add}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Thêm sản phẩm
+                </a>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Tồn kho</th>
+                    <th>Danh mục</th>
+                    <th>Nhà cung cấp</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product : ${products}">
+                    <td th:text="${product.id}"></td>
+                    <td th:text="${product.name}"></td>
+                    <td th:text="${product.price}"></td>
+                    <td th:text="${product.stock}"></td>
+                    <td th:text="${product.categoryId}"></td>
+                    <td th:text="${product.supplierId}"></td>
+                    <td th:text="${product.hidden} ? 'Ẩn' : 'Hiển thị'"></td>
+                    <td>
+                        <div class="d-flex flex-wrap justify-content-center gap-1">
+                            <a th:href="@{/admin/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-warning" title="Sửa">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            <form th:action="@{/admin/products/hide/{id}(id=${product.id})}" method="post" class="d-inline" th:if="${!product.hidden}">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="Ẩn">
+                                    <i class="bi bi-eye-slash-fill"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/products/unhide/{id}(id=${product.id})}" method="post" class="d-inline" th:if="${product.hidden}">
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Hiển thị">
+                                    <i class="bi bi-eye-fill"></i>
+                                </button>
+                            </form>
+
+                            <form th:action="@{/admin/products/update-stock/{id}(id=${product.id})}" method="post" class="d-inline d-flex align-items-center gap-1">
+                                <input type="number" name="stock" class="form-control form-control-sm w-50" required>
+                                <button type="submit" class="btn btn-sm btn-info" title="Cập nhật tồn kho">
+                                    <i class="bi bi-box-arrow-up"></i>
+                                </button>
+                            </form>
+
+                            <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post" class="d-inline"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Xóa">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-4 d-flex justify-content-center" th:if="${totalPages > 1}">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/products/list(page=${currentPage - 1}, keyword=${keyword})}">Trước</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/admin/products/list(page=${i}, keyword=${keyword})}"
+                           th:text="${i + 1}"></a>
+                    </li>
+
+
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/products/list(page=${currentPage + 1}, keyword=${keyword})}">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
